@@ -46,6 +46,26 @@ Other ways to create an audience:
 
 Only players who are online and have the PeakClient mod count as members.
 
+## Timing and helpers on an audience
+
+An audience can run work for its members and ends it when it closes.
+
+```java
+audience.after(100, () -> startRound());                  // once, after 100 ticks
+PeakScheduler.Handle ticker = audience.every(20, () -> tick());   // every second
+ticker.cancel();
+
+audience.timerSync("mygame:hud", "mygame:round-timer", () -> ticksLeft, () -> running);
+audience.waypointTracker(flag.getId(), flagCarrier);
+audience.addListener(listener);       // called when a member joins or leaves
+audience.refresh();                   // update the members now
+```
+
+- `timerSync` keeps a timer element of the members in step with your server time.
+- `waypointTracker` keeps a waypoint at the position of an entity. Send the waypoint first.
+- Members are refreshed about once a second. `refresh()` does it right away.
+- `PeakPlayers.ids(players)`, `of(...)` and `all(server)` turn players into the ids that several calls accept.
+
 ## Which one?
 
 | You want to | Use |
@@ -55,5 +75,6 @@ Only players who are online and have the PeakClient mod count as members.
 | Run a game with a live scoreboard | Audience and view |
 | Keep values, timers or waypoints in sync with a group | Audience |
 
-Close the audience when the game ends. This also removes its views and stops its tasks. For timing and reconnect details,
+Close the audience when the game ends. This also removes its views and stops its tasks. For complete examples, see
+[Examples](/examples). For timing and reconnect details,
 see [Threads and Timing](/concepts/threads-and-timing). To change a view, see [Updating Elements](/concepts/updates).

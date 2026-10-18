@@ -98,6 +98,7 @@ PeakReel reel = PeakReel.create("mygame:slot").size(100, 90)
 PeakClient.to(players).updateElement("mygame:hud", "mygame:slot", PeakPatch.reel().spinTo(2));
 ```
 
+`easing(...)` sets how the spin slows down: `DECELERATE` (default) or `SETTLE`, which overshoots slightly before it rests.
 `spinTo` accepts an index, a child id or an element. A new element is inserted at a random place and the reel lands on
 it. `spinOnStart(...)` spins as soon as the reel is shown. The client does not report back when the spin ends. Start your
 own timer with the same duration if the server needs to react.
@@ -115,7 +116,9 @@ PeakFeed feed = PeakFeed.create("mygame:killfeed").size(240, 150)
 PeakClient.to(players).addElement("mygame:hud", "mygame:killfeed", entry);
 ```
 
-`newestFirst(true)` puts new entries on top, `mainAxisAlign(END)` anchors the stack at the bottom. Entries are plain
+`newestFirst(true)` puts new entries on top, `mainAxisAlign(END)` anchors the stack at the bottom. `durations(enter, exit)`
+sets the animation times in ticks, `moveTicks(n)` how long neighbors take to close a gap and `slideDistance(px)` the length
+of slide animations. Entries are plain
 elements. A view that replaces the whole document loses entries that the server never knew about.
 
 ## Sorted List

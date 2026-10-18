@@ -75,3 +75,16 @@ PeakPieChart.create()
 turned off.
 
 Charts are generic. Use them for votes, team shares or anything else with a few categories.
+
+## Updating charts
+
+An update replaces the whole list of entries.
+
+```java
+PeakClient.to(players).updateElement("mygame:hud", "mygame:votes", PeakPatch.barChart().entries(List.of(
+        PeakChartEntry.of("Red", 14, PeakPaint.RED),
+        PeakChartEntry.of("Blue", 9, PeakPaint.BLUE))));
+```
+
+The same works for pie charts with `PeakPatch.pieChart().entries(...)`. Other options, such as `maxValue` or the legend, can
+be patched on their own.

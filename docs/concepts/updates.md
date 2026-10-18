@@ -43,6 +43,23 @@ PeakClient.to(players).addElement("mygame:hud", "mygame:feed", entry);
 PeakClient.to(players).deleteElement("mygame:hud", "mygame:old");
 ```
 
+Several changes can also go out in one packet. Operations are add, update (by id or class) and delete:
+
+```java
+PeakClient.to(players).sendUiUpdate("mygame:hud", List.of(
+        new PeakUiOperation.Update("mygame:score", PeakPatch.label().text("1 : 0").build()),
+        new PeakUiOperation.Delete("mygame:old-row")));
+```
+
+## Patch types
+
+`PeakPatch` has one factory per element type: `label()`, `timer()`, `image()`, `item()`, `block()`, `entity()`,
+`progressBar()`, `radialProgress()`, `iconBar()`, `barChart()`, `pieChart()`, `compass()`, `minimap()`, `worldAnchor()`,
+`panel()`, `div()`, `table()`, `flow()`, `shape()`, `conditional()`, `popup()`, `animated()`, `stagger()`, `carousel()`,
+`cycler()`, `reel()`, `feed()`, `sortedList()` and the input elements (`textBox()`, `richTextBox()`, `checkbox()`,
+`radioGroup()`, `dropdown()`, `numberField()`, `slider()`, `colorPicker()`, `itemSlot()`) and more. Every patch also has the
+common options of any element, such as `hidden`, `opacity` and `background`.
+
 ## Typed references
 
 A typed reference ties an id to an element type, so the compiler gives you the matching patch.

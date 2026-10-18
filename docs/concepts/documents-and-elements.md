@@ -27,6 +27,17 @@ An element is one building block of the interface: a label, a panel, an image, a
 Every element is created with a builder (`PeakLabel.create(id, text)`) and configured with chained calls. Containers take
 children with `add(...)`.
 
+## Document options
+
+| Call | Purpose |
+| --- | --- |
+| `scaling(...)` | `GUI_SCALE_DEPENDENT` (default) follows the player's GUI scale. `FIXED` keeps pixel sizes the same on every screen |
+| `documentTimeToLiveTicks(n)` | removes the document on the client when it was not updated for `n` ticks (0 = stays until removed) |
+| `deleteIfEmpty(true)` | an empty document removes the shown one with the same id |
+| `hideVanilla(...)` | hides parts of the vanilla HUD while the document is shown, see [Vanilla HUD](/vanilla-hud) |
+
+Menus have their own settings. See [Menus](/menus/overview).
+
 ## Ids
 
 An id lets you find an element later to update or delete it.

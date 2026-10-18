@@ -61,6 +61,30 @@ PeakButton.text("mygame:shop/more", "More").onClick(PeakAction.open("mygame:shop
 - `enabled(false)` disables an element.
 - A click on a child, such as the label of a button, counts for the nearest clickable parent.
 
+## States and tooltips
+
+An element that can be clicked changes its look with its state. Each style only names what differs from the normal look.
+
+| Call | Purpose |
+| --- | --- |
+| `hoverStyle(style)` | while the mouse is over it |
+| `pressedStyle(style)` | while the mouse button is held |
+| `disabledStyle(style)` | when `enabled(false)` |
+| `activeStyle(style)` | while it is active, for example a toggled formatting button |
+| `keepFocus(true)` | a click does not take the keyboard focus from a text box |
+
+```java
+button.hoverStyle(PeakStyle.create().background(0xFF4080C0))
+      .pressedStyle(PeakStyle.create().background(0xFF2060A0));
+```
+
+Hover and pressed styles change colors, borders, radius and shadows of containers. To give an image or an item a state,
+put it into a `PeakButton`.
+
+A tooltip is a text (`tooltip("Costs 10 coins")`, with `\n` for more lines) or any element
+(`tooltip(PeakPanel.create()...)`). Style it per element with `tooltipStyle(...)`, or for the whole menu in
+[Theme](/menus/theme). A tooltip element is not part of the document, so it cannot be updated by id.
+
 ## Scrolling
 
 Give a container `overflow(PeakOverflow.SCROLL)` and a fixed height or a `maxSize`. It then scrolls with the mouse wheel

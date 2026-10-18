@@ -1,6 +1,6 @@
 # Pitfalls
 
-Common mistakes and how to avoid them.
+Common mistakes and how to avoid them. If something does not show up at all, see [Troubleshooting](/reference/troubleshooting).
 
 ## Ids and references
 

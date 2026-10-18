@@ -46,6 +46,42 @@ scores.row(PeakLabel.create("1"), PeakLabel.create("Alex"), PeakLabel.create("12
 
 `1fr` and percent sizes need a known table size. In a table without a fixed width they behave like `auto`.
 
+### Tracks
+
+A track is one column or row. The string form (`"24px 1fr 60px"`) is the short way. For more control, build tracks:
+
+```java
+scores.columns(PeakTrack.px(24), PeakTrack.fill().min(80), PeakTrack.px(60).alignEnd());
+```
+
+| Track | Size |
+| --- | --- |
+| `PeakTrack.auto()` | as large as its content |
+| `PeakTrack.px(n)` | fixed pixels |
+| `PeakTrack.percent(p)` | share of the table |
+| `PeakTrack.fill([weight])` | share of the space that is left |
+
+`min(...)` and `max(...)` limit a track. `alignStart()`, `alignCenter()` and `alignEnd()` place the content of its cells.
+
+### Table decor
+
+Header, stripes and lines are off until you set them.
+
+```java
+scores.decor(d -> d
+        .headerRows(1).headerBackground(0xC03050A0)
+        .stripes(0x30FFFFFF, 0x10FFFFFF)
+        .lines(1, 0x60FFFFFF, PeakTableStyle.LineMode.ROWS)
+        .row(3, row -> row.background(0x60FFD700).noLine())
+        .column(2, column -> column.background(0x3055FF55)));
+```
+
+- Stripes alternate over the rows after the header.
+- `lines(...)` draws lines between rows, columns or both. `row(i, ...)` and `column(i, ...)` style a single row or column
+  (index starts at 0) and can replace its line.
+- Lines stop where a cell spans over them. `linesAcrossSpans(true)` draws them through.
+- Style the text of header cells yourself. The decor does not change label colors.
+
 ## Flow
 
 Places children in lines and wraps to the next line when the line is full. Use it for tags, badges, player heads or
@@ -94,6 +130,19 @@ PeakPopUpContainer.create("mygame:toast")
 
 For plain notifications, skip the container and use `PeakClient.to(players).notify("Flag captured!")`, or
 `notifySuccess`, `notifyWarning` and `notifyError`.
+
+For a popup with your own content, use the builder. It sends the popup and removes it after the time to live:
+
+```java
+PeakClient.to(players).popup()
+        .enterAnimation(PeakPopupAnimation.SLIDE_FROM_RIGHT)
+        .exitAnimation(PeakPopupAnimation.FADE)
+        .background(0xC0202830).padding(6)
+        .timeToLiveTicks(80)
+        .addLabel("Flag captured!", 0x55FF55)
+        .addChild(PeakItemElement.fixed(new ItemStack(Items.GOLD_INGOT)))
+        .show();
+```
 
 Animations: `NONE`, `FADE`, `SCALE`, `SLIDE_FROM_*`, `WIPE_FROM_*` and `FLIP_*`. The same animations work in the cycler,
 stagger, feed and sorted list. See [Animation and Displays](/elements/animation-and-displays).

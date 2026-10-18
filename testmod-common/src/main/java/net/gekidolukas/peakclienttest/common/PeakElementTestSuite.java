@@ -48,6 +48,9 @@ public final class PeakElementTestSuite {
         register(new ItemElementTest());
         register(new BlockElementTest());
         register(new VanillaHudElementTest());
+        register(new ExampleHudElementTest());
+        register(new ExampleScoreboardElementTest());
+        register(new ExampleMenuElementTest());
     }
 
     private PeakElementTestSuite() {}

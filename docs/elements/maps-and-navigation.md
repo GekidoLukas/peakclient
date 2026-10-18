@@ -21,6 +21,16 @@ PeakClient.to(players).removeWaypoint(flag.getId());
 To follow a moving entity, use `PeakWaypointTracker.create(waypointId, entity, targets)`. It keeps the position current and
 stops when the entity is gone. Send the waypoint to the same players first.
 
+A waypoint can also show the name or face of an entity instead of a plain label:
+
+```java
+PeakWaypoint carrier = PeakWaypoint.trackingEntity(player.getUUID().toString(),
+        PeakEntityTrackingMode.PLAYER_FACE, player.getX(), player.getY(), player.getZ());
+```
+
+Modes: `LIVING_NAME` (name of a mob), `PLAYER_NAME` and `PLAYER_FACE` (head of a player). The position is kept current by the
+tracker above.
+
 ## Compass
 
 A horizontal bar like a boss bar that shows directions and waypoints in front of the viewer.
@@ -40,7 +50,10 @@ PeakCompass.create("mygame:compass")
 | `showCardinalLabels`, `showIntercardinalLabels`, `showTickMarks` | the scale |
 | `overlapMode(...)` | what happens when waypoints overlap: `NONE` or `STACK` (stacked above or below) |
 | `groupSameNameWaypoints(boolean)` | merge waypoints with the same name that are close together |
-| `iconScaleRange(min, max)` | icons grow when waypoints are near |
+| `iconScaleRange(min, max)`, `iconScaleDistanceRange(near, far)` | icons grow when waypoints are near |
+| `tickPosition(...)`, `tickIntervalDegrees(d)` | scale at the `TOP` or `BOTTOM` and the distance between ticks |
+| `stackDirection(...)`, `stackSpacing(px)`, `maxStackedWaypoints(n)` | how stacked waypoints are placed (`UP` or `DOWN`) |
+| `backgroundColor`, `tickColor` | colors |
 
 ## Minimap
 
@@ -64,6 +77,9 @@ The texture is a picture of your map, placed in the world by `worldBounds`. The 
 | `borderColor`, `borderTexture` | frame |
 | `outOfImageColor`, `outOfBorderColor` | color outside the image or outside the border |
 | `edgeIndicatorMaxDistance(blocks)` | waypoints outside the view are shown at the edge up to this distance |
+| `edgeIconScaleRange(min, max)`, `waypointLabelScale(f)` | size of edge icons and waypoint labels |
+| `worldBorderShape(...)`, `worldBorderColor`, `worldBorderThickness` | look of the border line: `SQUARE` or `CIRCLE` |
+| `playerIconTexture(path)`, `playerIconSize(px)` | your own marker for the viewer |
 
 The custom world border is set on the server with `setCustomWorldBorder(...)`, `setNextCustomWorldBorder(...)` for a
 shrinking border, and `clearCustomWorldBorder()`.
@@ -97,5 +113,37 @@ PeakWorldAnchor flagMarker = PeakWorldAnchor.waypoint(flag.getId());
 By default blocks and entities cover the anchor pixel by pixel: where a wall is nearer than the point, that part of the
 label is hidden. `noOcclusion()` makes it always visible. Move an anchor with
 `PeakPatch.worldAnchor().moveTo(x, y, z)`.
+
+### Target options
+
+```java
+PeakWorldAnchor.entity(uuid).target(t -> t.point(PeakAnchorTarget.EntityPoint.ABOVE_HEAD).above(0.5));
+```
+
+| Call | Purpose |
+| --- | --- |
+| `point(...)` | for entities: `ABOVE_HEAD`, `CENTER` or `FEET` |
+| `above(blocks)` | lifts the point |
+| `offset(x, y, z)` | shifts the point in the world |
+
+An entity that is not loaded, a waypoint that does not exist and a different `dimension(...)` hide the anchor.
+
+### Occlusion options
+
+```java
+PeakWorldAnchor.entity(uuid).occlusion(PeakOcclusion.blocksAndEntities().dimTo(0.35f));
+```
+
+| Option | Values |
+| --- | --- |
+| mode | `PARTIAL` (default, per pixel), `BLOCKS`, `BLOCKS_AND_ENTITIES` (whole label by line of sight), `NONE` |
+| `hide()`, `dim()`, `dimTo(f)` | hide the covered part, or dim it |
+| `blockShape(...)` | `VISUAL` (glass does not cover) or `COLLIDER` |
+| `entities(...)` | which entities cover: `PLAYERS`, `LIVING`, `ALL` (line modes only) |
+| `ignoreTarget(boolean)` | the target entity and its own block never cover the anchor |
+| `depthBias(blocks)` | `PARTIAL` only: tests the label this far nearer to the camera |
+| `fadeTicks(n)` | time to fade when the cover changes |
+
+`PARTIAL` needs one frame to start and falls back to the line test on some setups, such as certain shader packs.
 
 An anchor is always placed absolutely and does not change the layout of its parent. It is not supported in menus.

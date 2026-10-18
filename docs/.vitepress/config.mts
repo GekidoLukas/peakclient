@@ -26,7 +26,8 @@ export default defineConfig({
       {
         text: 'Introduction',
         items: [
-          { text: 'Getting Started', link: '/getting-started' }
+          { text: 'Getting Started', link: '/getting-started' },
+          { text: 'Examples', link: '/examples' }
         ]
       },
       {
@@ -86,15 +87,27 @@ export default defineConfig({
           { text: 'Built-in Placeholders', link: '/reference/built-in-placeholders' },
           { text: 'Naming and IDs', link: '/reference/naming-and-ids' },
           { text: 'Pitfalls', link: '/reference/pitfalls' },
+          { text: 'Troubleshooting', link: '/reference/troubleshooting' },
+          { text: 'Compatibility', link: '/reference/compatibility' },
           { text: 'Changelog', link: '/reference/changelog' }
         ]
       }
     ],
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/GekidoLukas/peakclient' }
+    ],
+    editLink: {
+      pattern: 'https://github.com/GekidoLukas/peakclient/edit/main/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
     search: {
       provider: 'local'
     },
     footer: {
-      message: `PeakClient documentation v${currentVersion}`
+      message: `PeakClient documentation v${currentVersion}. Licensed under the <a href="https://github.com/GekidoLukas/peakclient/blob/main/LICENSE">GNU GPL v3.0</a>.`
     }
+  },
+  sitemap: {
+    hostname: 'https://gekidolukas.github.io/peakclient/'
   }
 })

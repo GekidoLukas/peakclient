@@ -9,4 +9,4 @@ It is built for events and minigames: scoreboards, killfeeds, voting, team score
 
 ## Documentation
 
-Read the developer documentation at [gekidolukas.github.io](https://gekidolukas.github.io).
+Read the developer documentation at [gekidolukas.github.io/peakclient](https://gekidolukas.github.io/peakclient/).

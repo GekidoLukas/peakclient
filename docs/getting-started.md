@@ -15,27 +15,46 @@ It is built for events and minigames: scoreboards, killfeeds, voting, team score
 
 ## Add the dependency
 
-Add PeakClient to your server mod.
+PeakClient is published on [Modrinth](https://modrinth.com), which also serves every version as a Maven artifact. No
+account or token is needed to download it.
 
-::: warning Not published yet
-PeakClient has no public repository yet. The coordinates below are placeholders and will change once it is published.
-:::
+Add the Modrinth repository to your `build.gradle`:
+
+```groovy
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+```
+
+Then add the dependency for your loader:
 
 ::: code-group
 
 ```groovy [Fabric]
 dependencies {
-    modImplementation "net.gekidolukas.peakclient:peakclient-fabric:1.0.0"
+    modImplementation "maven.modrinth:peakclient:1.0.0-fabric"
 }
 ```
 
 ```groovy [NeoForge]
 dependencies {
-    implementation "net.gekidolukas.peakclient:peakclient-neoforge:1.0.0"
+    implementation "maven.modrinth:peakclient:1.0.0-neoforge"
 }
 ```
 
 :::
+
+Versions are named `<version>-<loader>`. Replace `1.0.0` with the version you want to build against.
 
 Then declare it as required in your mod metadata. The mod id is `peakclient`.
 
@@ -72,8 +91,9 @@ PeakClient.onClientReady(event -> {         // a player with the mod finished jo
 });
 ```
 
-Players without the mod are skipped silently, so you do not have to filter them yourself. Calls from other threads are
-queued onto the server thread and take effect at the next tick.
+The ready event also carries `protocolVersion()`, the version of the client's mod. Players without the mod are skipped
+silently, so you do not have to filter them yourself. Calls from other threads are queued onto the server thread and take
+effect at the next tick.
 
 ## Your first HUD
 
@@ -92,8 +112,11 @@ PeakClient.to(player).sendUi(hud);
 
 ## Next steps
 
+- [Examples](/examples): three complete examples to start from.
+- [Compatibility](/reference/compatibility): versions, loaders and who needs the mod.
 - [Documents and Elements](/concepts/documents-and-elements): how an interface is built.
 - [Sending to Players](/concepts/sending): targets, audiences and views.
 - [Elements Overview](/elements/overview): the building blocks.
 - [Menus](/menus/overview): interfaces the player can click and type into.
 - [Pitfalls](/reference/pitfalls): common mistakes to avoid.
+- [Troubleshooting](/reference/troubleshooting): what to check when a player sees nothing.
