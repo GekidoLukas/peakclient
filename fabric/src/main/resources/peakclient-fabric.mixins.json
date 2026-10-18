@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.gekidolukas.peakclient.fabric.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "peakclient.refmap.json",
+  "client": [
+    "GuiVanillaHudMixin",
+    "OffhandMixin",
+    "BossHealthOverlayMixin",
+    "SubtitleOverlayMixin",
+    "PeakDebugRenderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

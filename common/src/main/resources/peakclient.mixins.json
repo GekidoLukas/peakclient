@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.gekidolukas.peakclient.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "peakclient.refmap.json",
+  "client": [
+    "AdvancementToastMixin",
+    "SystemToastMixin",
+    "TutorialToastMixin",
+    "RecipeToastMixin",
+    "EntityRendererMixin",
+    "LivingEntityRendererMixin",
+    "MobRendererMixin",
+    "LevelRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

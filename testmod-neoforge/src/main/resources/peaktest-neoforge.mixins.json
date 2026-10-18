@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.gekidolukas.peakclienttest.neoforge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "peaktest-neoforge.refmap.json",
+  "client": [],
+  "server": [
+    "PeakTestExampleMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

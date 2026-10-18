@@ -1,0 +1,7 @@
+package net.gekidolukas.peakclient.ui;
+
+public enum PeakConditionType {
+    DIMENSION, GAMEMODE, SNEAKING, SPRINTING, SWIMMING, FLYING, RIDING,
+    UNDERWATER, IS_DAY, IS_NIGHT, HEALTH_BELOW, HEALTH_ABOVE,
+    TARGETING_ENTITY, TARGETING_BLOCK
+}

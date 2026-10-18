@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.gekidolukas.peakclient.neoforge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "peakclient.refmap.json",
+  "client": [
+    "OffhandMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

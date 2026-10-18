@@ -1,0 +1,15 @@
+package net.gekidolukas.peakclienttest.neoforge.mixin;
+
+import net.minecraft.server.MinecraftServer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(MinecraftServer.class)
+public abstract class PeakTestExampleMixin {
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void peaktest$onInit(CallbackInfo ci) {
+        System.out.println("[PeakTest] Example mixin active - mixins are wired correctly.");
+    }
+}

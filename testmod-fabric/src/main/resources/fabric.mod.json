@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "peaktest",
+  "version": "${version}",
+  "name": "PeakClient Test Module",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["net.gekidolukas.peakclienttest.fabric.PeakTestModFabric"]
+  },
+  "mixins": [
+    "peaktest-fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "1.21.1"
+  }
+}

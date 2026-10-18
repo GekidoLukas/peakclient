@@ -1,0 +1,18 @@
+{
+  "peakclient.timer.unit.ticks": "t",
+  "peakclient.timer.unit.seconds": "s",
+  "peakclient.timer.unit.minutes": "m",
+  "peakclient.timer.unit.hours": "h",
+  "peakclient.timer.unit.days": "d",
+  "peakclient.direction.north": "N",
+  "peakclient.direction.northeast": "NE",
+  "peakclient.direction.east": "E",
+  "peakclient.direction.southeast": "SE",
+  "peakclient.direction.south": "S",
+  "peakclient.direction.southwest": "SW",
+  "peakclient.direction.west": "W",
+  "peakclient.direction.northwest": "NW",
+  "peakclient.weather.clear": "Clear",
+  "peakclient.weather.rain": "Rain",
+  "peakclient.weather.thunder": "Thunder"
+}

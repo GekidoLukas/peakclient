@@ -1,0 +1,44 @@
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+loom {
+    mixin {
+        defaultRefmapName = "peaktest-fabric.refmap.json"
+    }
+    
+    mods {
+        register("fabric") {
+            sourceSet("main", ":fabric")
+        }
+    }
+}
+
+configurations {
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive = true }
+    common(project(path: ':testmod-common', configuration: 'namedElements')) { transitive = true }
+
+    implementation project(path: ':fabric', configuration: 'namedElements')
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand version: inputs.properties.version
+    }
+}
