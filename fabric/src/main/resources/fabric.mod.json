@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "id": "peakclient",
   "version": "${version}",
-  "name": "Peak Client",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "PeakClient",
+  "description": "Client side of PeakClient, a server-driven HUD and menu system. Server mods describe an interface (HUD elements, menus, minimaps, charts and more) and this mod renders it on your screen. Install it on the client to see the interfaces of servers that use PeakClient.",
   "authors": [
     "GekidoLukas"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://gekidolukas.com",
+    "sources": "https://github.com/GekidoLukas/peakclient",
+    "issues": "https://github.com/GekidoLukas/peakclient/issues"
   },
-  "license": "CC0-1.0",
-  "icon": "assets/peakclient/icon.png",
+  "license": "GPL-3.0-only",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -31,8 +31,5 @@
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }

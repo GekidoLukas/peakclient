@@ -1,15 +1,16 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/GekidoLukas/peakclient/issues"
+license = "GPL-3.0-only"
 
 [[mods]]
 modId = "peakclient"
 version = "${version}"
 displayName = "Peak Client"
 authors = "GekidoLukas"
+displayURL = "https://gekidolukas.com"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+Client side of PeakClient, a server-driven HUD and menu system. Server mods describe an interface (HUD elements, menus, minimaps, charts and more) and this mod renders it on your screen. Install it on the client to see the interfaces of servers that use PeakClient.
 '''
 #logoFile = ""
 

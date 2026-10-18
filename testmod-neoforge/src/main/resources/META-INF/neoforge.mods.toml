@@ -7,9 +7,6 @@ modId = "peaktest"
 version = "${version}"
 displayName = "PeakClient Test Module"
 
-[[mixins]]
-config = "peaktest-neoforge.mixins.json"
-
 [[dependencies.peaktest]]
 modId = "neoforge"
 type = "required"
