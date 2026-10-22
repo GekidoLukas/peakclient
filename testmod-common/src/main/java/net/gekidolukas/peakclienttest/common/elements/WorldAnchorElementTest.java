@@ -108,6 +108,17 @@ public final class WorldAnchorElementTest implements PeakElementTest {
                                             .add(tag("Dimmed where covered", 0xFF33AA55)));
                             say(player, "stand so that a pillar or wall edge crosses a label: the border follows the edge pixel by pixel");
                         }),
+                PeakElementTestStep.of("partial occlusion through glass and water: three labels 5 blocks ahead; hold a glass pane or stained glass in front of the left one, put the middle one behind water, the right one uses translucentAlpha(0) and stays hidden behind glass", 600,
+                        (player, docId) -> {
+                            Vec3 point = ahead(player, 5);
+                            send(player, docId,
+                                    PeakWorldAnchor.at("peaktest:anchor/glass-default", point.x - 2.0, player.getY() + 1.6, point.z)
+                                            .pivot(PeakAnchor.CENTER).add(tag("Seen through glass at 60 %", 0xFF3366CC)),
+                                    PeakWorldAnchor.at("peaktest:anchor/glass-hidden", point.x + 2.0, player.getY() + 1.6, point.z)
+                                            .pivot(PeakAnchor.CENTER).occlusion(PeakOcclusion.partial().translucentAlpha(0f))
+                                            .add(tag("Hidden by glass", 0xFFCC7722)));
+                            say(player, "build a glass wall or a water pool between you and the labels: the first two stay visible but weaker behind translucent blocks, the third disappears behind them, solid blocks hide all three");
+                        }),
                 PeakElementTestStep.of("partial occlusion on a target entity: labels on a nearby mob or player with default bias and with 0 bias (the model should never cut the label with the default)", 600,
                         (player, docId) -> {
                             send(player, docId,

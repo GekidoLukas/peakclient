@@ -6,7 +6,7 @@ Shows text. Use it for everything from a title to a score line.
 
 ```java
 PeakLabel.create("mygame:title", "§6Capture the Flag").shadow(true);
-PeakLabel.translatable("mygame:welcome", "mygame.welcome", playerName);
+PeakLabel.create("mygame:welcome", Component.translatable("mygame.welcome", playerName));
 ```
 
 | Option | Purpose |
@@ -21,7 +21,10 @@ PeakLabel.translatable("mygame:welcome", "mygame.welcome", playerName);
 - Text may contain format codes (`§6`, `§l`) and placeholders such as `{mygame:score#0}`. See
   [Values and Placeholders](/concepts/values-and-placeholders) and [Built-in Placeholders](/reference/built-in-placeholders).
 - A gradient in `color(...)` is spread over the line. See [Colors and Gradients](/styling/colors-and-gradients).
-- `translatable` uses a language key, so each player sees the text in their own language.
+- Text is a Minecraft `Component`. A `String` becomes plain text. A `Component.translatable(...)` uses a language key, so each
+  player sees the text in their own language. Colors, fonts, bold, italic, underline, strikethrough and obfuscated of a `Component`
+  are drawn. A style that ends with its part does not carry into the next part. Hover and click events are removed and never used.
+- `PeakLabel.translatable(key, args...)` is a short form for a translatable label.
 - Count-up looks at the first number of the text only. It is meant for values you set now and then, such as a score.
   For time, use a timer.
 
@@ -55,4 +58,32 @@ PeakTooltipLabel.create("mygame:hint", "Hold sneak to aim")
 ```
 
 The background is a drawn box, the vanilla tooltip look, or a custom texture. `tooltipPadding(horizontal, vertical)` sets
-the space inside.
+the space between text and edge on each side. A custom texture is split into nine parts with `backgroundTexture(path, width, height, corner)`:
+the corners stay as they are and the edges and the middle are repeated from their centre, so the cut-off parts are equal on both sides. The text keeps
+the corner size as its minimum distance to the edge.
+
+## Components everywhere
+
+Every text that is shown to the player accepts a `String` or a Minecraft `Component`: labels, tooltips, timer prefix and
+suffix, chart entry names, waypoint names, text box placeholders, dropdown placeholders and options, radio group options,
+checkbox text, the item count of an item slot, menu titles and the texts of templates. Use `Component.translatable(...)`
+for text in the player's language and `Component.literal(...)` with styles for colors and bold.
+
+```java
+PeakBarChart.create().addEntry(Component.translatable("mygame.team.red"), 12, PeakPaint.RED);
+PeakWaypoint.of(120, 70, -40, Component.translatable("mygame.flag"));
+PeakTimer.countDownFrom(600).prefix(Component.translatable("mygame.time_left"));
+```
+
+Placeholders such as `{mygame:score#0}` work inside these texts. A placeholder takes the style of its first character, and a value with format codes
+keeps them. Custom fonts, for example `Style.EMPTY.withFont(ResourceLocation.parse("minecraft:alt"))`, are drawn. Hover events, click events and
+insertions of a `Component` are always removed.
+
+## Languages
+
+PeakClient ships its own texts in English and German: the units of timers, the compass directions, the weather and the texts of
+[templates](/menus/templates#texts-and-languages). They follow the language of the player. To change or add a language, add a resource pack or
+mod resource with `assets/peakclient/lang/<language>.json` and the same keys.
+
+Your own texts use `Component.translatable("mygame.key")` and a lang file in your mod. The client logs one warning per
+translation key that is missing in the current language, so typos show up in the log.

@@ -27,6 +27,8 @@ PeakLabel.create("mygame:kills", "Kills: " + KILLS.placeholder("0"));
 
 There are keys for strings, integers, longs, doubles and booleans.
 
+Use `PeakValueKey.ofComponent("mygame:name")` for a styled or translated value. The player sees the value in their own language, with its colors and fonts. A value that has no style of its own takes the style of the placeholder. In places that need plain text, such as a texture path or a number, only the text of the value is used.
+
 ## Setting values
 
 ```java
@@ -55,6 +57,10 @@ Colors take `#RRGGBB`, `#AARRGGBB` or a gradient. `PeakBindingHelper` writes the
 [Colors and Gradients](/styling/colors-and-gradients).
 
 If a value cannot be resolved, the field keeps its normal value.
+
+A binding ends when you patch the bound field yourself: the patched value stays and the field no longer follows the
+placeholder. To change the value and keep the binding, send the binding again in the same patch. `unbind` ends a binding
+and puts the original value back.
 
 ## Built-in placeholders
 

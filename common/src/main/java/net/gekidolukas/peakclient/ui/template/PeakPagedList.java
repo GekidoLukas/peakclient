@@ -8,17 +8,21 @@ import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.PeakSpinner;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class PeakPagedList {
     public static final String LOAD_PAGE_ARG = "page";
+    public static final String PREVIOUS_KEY = "peakclient.template.paged.previous";
+    public static final String NEXT_KEY = "peakclient.template.paged.next";
+    public static final String LABEL_KEY = "peakclient.template.paged.label";
+    public static final String LOADING_KEY = "peakclient.template.paged.loading";
 
     private final String id;
     private final int itemsPerPage;
@@ -26,14 +30,14 @@ public final class PeakPagedList {
     private int gap = 2;
     private int width = -1;
     private int navGap = 6;
-    private String labelFormat = "Page %d / %d";
-    private String previousText = "<";
-    private String nextText = ">";
+    private String labelKey = LABEL_KEY;
+    private Component previousText = Component.translatable(PREVIOUS_KEY);
+    private Component nextText = Component.translatable(NEXT_KEY);
     private Consumer<PeakButton> navButton;
     private Consumer<PeakLabel> navLabel;
     private boolean remote;
     private int remotePages = 1;
-    private String loadingText = "Loading...";
+    private Component loadingText = Component.translatable(LOADING_KEY);
     private Consumer<PeakLabel> loadingLabel;
     private Function<String, PeakElement<?>> loadingFactory;
 
@@ -80,12 +84,16 @@ public final class PeakPagedList {
         return this;
     }
 
-    public PeakPagedList labelFormat(String format) {
-        this.labelFormat = format == null ? "" : format;
+    public PeakPagedList labelKey(String key) {
+        this.labelKey = key == null || key.isEmpty() ? LABEL_KEY : key;
         return this;
     }
 
     public PeakPagedList buttonTexts(String previous, String next) {
+        return buttonTexts(Component.literal(previous), Component.literal(next));
+    }
+
+    public PeakPagedList buttonTexts(Component previous, Component next) {
         this.previousText = previous;
         this.nextText = next;
         return this;
@@ -108,7 +116,11 @@ public final class PeakPagedList {
     }
 
     public PeakPagedList loadingText(String text) {
-        this.loadingText = text == null ? "" : text;
+        return loadingText(Component.literal(text == null ? "" : text));
+    }
+
+    public PeakPagedList loadingText(Component text) {
+        this.loadingText = text == null ? Component.empty() : text;
         return this;
     }
 
@@ -222,7 +234,7 @@ public final class PeakPagedList {
             navButton.accept(next);
         }
         PeakLabel label = PeakLabel.create(id + "/label-" + page,
-                String.format(Locale.ROOT, labelFormat, page + 1, pages)).color(0xAAAAAA);
+                Component.translatable(labelKey, page + 1, pages)).color(0xAAAAAA);
         if (navLabel != null) navLabel.accept(label);
         row.add(previous, label, next);
         return row;

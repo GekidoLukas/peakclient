@@ -2,18 +2,18 @@ package net.gekidolukas.peakclient.render;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakTooltipBackgroundStyle;
 import net.gekidolukas.peakclient.ui.PeakTooltipLabel;
 import net.gekidolukas.peakclient.ui.PeakTooltipStyle;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 
 public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakTooltipLabel> {
 
-    private static final int DRAWN_BOX_BASE_PADDING_HORIZONTAL = 8;
-    private static final int DRAWN_BOX_BASE_PADDING_VERTICAL = 8;
+    private static final int DRAWN_BOX_BASE_PADDING_HORIZONTAL = 4;
+    private static final int DRAWN_BOX_BASE_PADDING_VERTICAL = 4;
     private static final int TOOLTIP_BORDER_X = 4;
     private static final int TOOLTIP_BORDER_Y = 4;
     private static final PeakPaint TOOLTIP_BACKGROUND = PeakPaint.solid(0xF0100010);
@@ -23,7 +23,7 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
 
     @Override
     public void renderContent(PeakRenderContext ctx, PeakTooltipLabel tooltip, int width, int height) {
-        String text = PeakPlaceholderResolver.resolve(resolveTooltipText(tooltip));
+        PeakStyledText text = resolveTooltipText(tooltip);
 
         switch (tooltip.getBackgroundStyle()) {
             case VANILLA -> {
@@ -36,7 +36,7 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
                     try {
                         ResourceLocation texture = PeakValueResolver.requireLocation(tooltip.getBackgroundTexture());
                         PeakUiRenderer.blitNineSlice(ctx.graphics(), texture, 0, 0, width, height,
-                                tooltip.getTextureWidth(), tooltip.getTextureHeight(), tooltip.getCornerSize());
+                                tooltip.getTextureWidth(), tooltip.getTextureHeight(), tooltip.getCornerSize(), true);
                     } catch (Exception ignored) { }
                 }
             }
@@ -47,8 +47,8 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
         }
 
         Padding padding = effectiveTooltipPadding(tooltip);
-        int textX = padding.horizontal() / 2;
-        int textY = padding.vertical() / 2;
+        int textX = padding.horizontal();
+        int textY = padding.vertical();
 
         if (tooltip.getBackgroundStyle() == PeakTooltipBackgroundStyle.VANILLA) {
             textX += TOOLTIP_BORDER_X;
@@ -59,7 +59,7 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
     }
     @Override
     public PeakPixelSize measureContent(Font font, PeakTooltipLabel tooltip) {
-        String text = PeakPlaceholderResolver.resolve(resolveTooltipText(tooltip));
+        PeakStyledText text = resolveTooltipText(tooltip);
         return tooltipFootprintSize(font, tooltip, text);
     }
 
@@ -98,15 +98,11 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
         PeakPaintRenderer.fill(graphics, border, left + w - line, top + line, left + w, top + h - line, left, top, left + w, top + h);
     }
 
-    private static String resolveTooltipText(PeakTooltipLabel label) {
-        if (label.getTranslationKey() != null) {
-            Object[] args = label.getTranslationArgs().toArray();
-            return I18n.get(label.getTranslationKey(), args);
-        }
-        return label.getText();
+    private static PeakStyledText resolveTooltipText(PeakTooltipLabel label) {
+        return PeakTextResolver.resolved(label, label.getText());
     }
 
-    private static PeakPixelSize tooltipFootprintSize(Font font, PeakTooltipLabel tooltip, String text) {
+    private static PeakPixelSize tooltipFootprintSize(Font font, PeakTooltipLabel tooltip, PeakStyledText text) {
         PeakPixelSize content = tooltipContentSize(font, tooltip, text);
         if (tooltip.getBackgroundStyle() == PeakTooltipBackgroundStyle.VANILLA) {
             return new PeakPixelSize(content.width() + 2 * TOOLTIP_BORDER_X, content.height() + 2 * TOOLTIP_BORDER_Y);
@@ -114,9 +110,9 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
         return content;
     }
 
-    private static PeakPixelSize tooltipContentSize(Font font, PeakTooltipLabel tooltip, String text) {
+    private static PeakPixelSize tooltipContentSize(Font font, PeakTooltipLabel tooltip, PeakStyledText text) {
         Padding padding = effectiveTooltipPadding(tooltip);
-        return new PeakPixelSize(font.width(text) + padding.horizontal(), font.lineHeight + padding.vertical());
+        return new PeakPixelSize(text.width(font) + 2 * padding.horizontal(), font.lineHeight + 2 * padding.vertical());
     }
 
     private static Padding effectiveTooltipPadding(PeakTooltipLabel tooltip) {
@@ -125,6 +121,9 @@ public final class PeakTooltipLabelRenderer implements PeakElementRenderer<PeakT
         if (tooltip.getBackgroundStyle() == PeakTooltipBackgroundStyle.DRAWN_BOX) {
             horizontal += DRAWN_BOX_BASE_PADDING_HORIZONTAL;
             vertical += DRAWN_BOX_BASE_PADDING_VERTICAL;
+        } else if (tooltip.getBackgroundStyle() == PeakTooltipBackgroundStyle.CUSTOM_TEXTURE) {
+            horizontal += tooltip.getCornerSize();
+            vertical += tooltip.getCornerSize();
         }
         return new Padding(horizontal, vertical);
     }

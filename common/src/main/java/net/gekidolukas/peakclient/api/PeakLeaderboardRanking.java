@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.api;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 public final class PeakLeaderboardRanking<K> {
-    public record Entry<K>(K key, String name, double score, long order) {}
+    public record Entry<K>(K key, Component name, double score, long order) {}
 
     public record Placed<K>(Entry<K> entry, int rank) {}
 
@@ -42,6 +44,10 @@ public final class PeakLeaderboardRanking<K> {
     public Entry<K> get(K key) { return entries.get(key); }
 
     public void set(K key, String name, double score) {
+        set(key, Component.literal(name == null ? "" : name), score);
+    }
+
+    public void set(K key, Component name, double score) {
         Entry<K> existing = entries.get(key);
         if (existing != null && existing.score() == score && existing.name().equals(name)) return;
         long order = existing != null && existing.score() == score ? existing.order() : nextOrder++;
@@ -51,16 +57,20 @@ public final class PeakLeaderboardRanking<K> {
 
     public void set(K key, double score) {
         Entry<K> existing = entries.get(key);
-        set(key, existing != null ? existing.name() : String.valueOf(key), score);
+        set(key, existing != null ? existing.name() : Component.literal(String.valueOf(key)), score);
     }
 
     public void add(K key, double delta) {
         Entry<K> existing = entries.get(key);
-        if (existing == null) set(key, String.valueOf(key), delta);
+        if (existing == null) set(key, Component.literal(String.valueOf(key)), delta);
         else set(key, existing.name(), existing.score() + delta);
     }
 
     public void add(K key, String name, double delta) {
+        add(key, Component.literal(name == null ? "" : name), delta);
+    }
+
+    public void add(K key, Component name, double delta) {
         Entry<K> existing = entries.get(key);
         set(key, name, existing == null ? delta : existing.score() + delta);
     }

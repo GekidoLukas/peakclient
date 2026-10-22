@@ -9,7 +9,10 @@ import net.gekidolukas.peakclient.ui.PeakDocument;
 import net.gekidolukas.peakclienttest.common.PeakElementTest;
 import net.gekidolukas.peakclienttest.common.PeakElementTestStep;
 import net.gekidolukas.peakclienttest.common.PeakTestTimeline;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -118,6 +121,22 @@ public final class LeaderboardElementTest implements PeakElementTest {
                     }
                     timeline.start();
                     say(player, "lower is better; equal times keep their order until someone improves");
+                }));
+
+        steps.add(PeakElementTestStep.of("component names: gold bold, red, translated and gradient-free styled names; your own row below shows your styled name too", LONG_TICKS,
+                (player, docId) -> {
+                    PeakLeaderboardWindow<String> board = PeakLeaderboardWindow.<String>create("peaktest:leaderboard/names", 5)
+                            .intervalTicks(5).ownRow(uuid -> uuid.equals(player.getUUID()) ? "me" : null);
+                    board.set("gold", Component.literal("Gold Bold").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), 90);
+                    board.set("red", Component.literal("Red Italic").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC), 80);
+                    board.set("seed", Component.translatable("commands.seed.success", Component.literal("42").withStyle(ChatFormatting.YELLOW)), 70);
+                    board.set("alt", Component.literal("Alt font").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:alt"))), 60);
+                    board.set("plain", "Plain legacy §aGreen", 50);
+                    board.set("me", Component.literal(player.getGameProfile().getName()).withStyle(ChatFormatting.AQUA, ChatFormatting.UNDERLINE), 10);
+                    PeakTestTimeline timeline = open(player, docId, false, List.of(board));
+                    timeline.atSeconds(4, () -> board.add("me", 85));
+                    timeline.start();
+                    say(player, "all names keep their styles; after 4 s you climb into the list and your own row hides");
                 }));
 
         steps.add(PeakElementTestStep.of("own row (outside the window): you start at the bottom; the row below the list shows your rank until you climb into the top 6", LONG_TICKS,

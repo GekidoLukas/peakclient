@@ -57,7 +57,7 @@ class PeakActionTest {
         JsonObject patch = back.actionsFor(PeakEvent.CLICK).get(1).patch();
         assertEquals("Bought", patch.get("text").getAsString());
         assertEquals(PeakActionType.CLOSE_MENU, back.actionsFor(PeakEvent.CLICK).get(2).type());
-        assertEquals("Buy it", back.getInteraction().getTooltip());
+        assertEquals("Buy it", back.getInteraction().getTooltip().getString());
         assertTrue(back.getInteraction().isEnabled());
     }
 }

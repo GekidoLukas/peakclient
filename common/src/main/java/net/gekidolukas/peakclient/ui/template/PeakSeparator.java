@@ -4,6 +4,7 @@ import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakId;
 import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
+import net.minecraft.network.chat.Component;
 
 public final class PeakSeparator {
     private final String id;
@@ -11,7 +12,7 @@ public final class PeakSeparator {
     private PeakPaint color = PeakPaint.solid(0xFF555555);
     private int width = 180;
     private int spacing = 3;
-    private String label = "";
+    private Component label = Component.empty();
     private PeakPaint labelColor = PeakPaint.solid(0xAAAAAA);
 
     private PeakSeparator(String id) {
@@ -47,7 +48,11 @@ public final class PeakSeparator {
     }
 
     public PeakSeparator label(String label) {
-        this.label = label == null ? "" : label;
+        return label(Component.literal(label == null ? "" : label));
+    }
+
+    public PeakSeparator label(Component label) {
+        this.label = label == null ? Component.empty() : label;
         return this;
     }
 
@@ -61,9 +66,9 @@ public final class PeakSeparator {
     }
 
     public PeakPanel build() {
-        PeakPanel line = PeakPanel.create(label.isEmpty() ? id : id + "/line")
+        PeakPanel line = PeakPanel.create(label.getString().isEmpty() ? id : id + "/line")
                 .size(width, thickness).background(color).padding(0);
-        if (label.isEmpty()) {
+        if (label.getString().isEmpty()) {
             line.margin(spacing, 0, spacing, 0);
             return line;
         }

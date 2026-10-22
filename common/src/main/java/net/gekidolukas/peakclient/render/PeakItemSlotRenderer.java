@@ -2,6 +2,7 @@ package net.gekidolukas.peakclient.render;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakItemSlot;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.client.PeakMenuInteractionState;
 import net.minecraft.client.Minecraft;
@@ -57,7 +58,9 @@ public final class PeakItemSlotRenderer implements PeakElementRenderer<PeakItemS
             decorated = stack.copy();
             decorated.setDamageValue(0);
         }
-        String countText = !slot.isShowCount() ? "" : slot.getCountText().isEmpty() ? null : slot.getCountText();
+        PeakStyledText customCount = PeakTextResolver.resolved(slot, slot.getCountText());
+        boolean ownCount = slot.isShowCount() && !customCount.isEmpty();
+        String countText = !slot.isShowCount() || ownCount ? "" : null;
 
         boolean offscreen = slot.getOpacity() < 0.999f;
         if (offscreen) PeakOffscreenOpacity.begin(mc, graphics);
@@ -67,6 +70,13 @@ public final class PeakItemSlotRenderer implements PeakElementRenderer<PeakItemS
             graphics.pose().scale(scale, scale, 1f);
             graphics.renderItem(stack, 0, 0);
             graphics.renderItemDecorations(ctx.font(), decorated, 0, 0, countText);
+            if (ownCount) {
+                graphics.flush();
+                graphics.pose().pushPose();
+                graphics.pose().translate(0f, 0f, 200f);
+                PeakImmediateRender.text(graphics, ctx.font(), customCount, 17 - customCount.width(ctx.font()), 9, 0xFFFFFFFF, true);
+                graphics.pose().popPose();
+            }
             graphics.pose().popPose();
         } finally {
             if (offscreen) PeakOffscreenOpacity.end(mc, graphics, slot.getOpacity());

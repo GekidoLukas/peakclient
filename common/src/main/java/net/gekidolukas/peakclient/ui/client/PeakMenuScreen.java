@@ -18,6 +18,7 @@ import net.gekidolukas.peakclient.ui.PeakEvent;
 import net.gekidolukas.peakclient.ui.PeakInteraction;
 import net.gekidolukas.peakclient.ui.PeakMenuSettings;
 import net.gekidolukas.peakclient.ui.PeakTheme;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -44,14 +45,15 @@ public final class PeakMenuScreen extends Screen {
     private EditBox inputGuard;
 
     public PeakMenuScreen() {
-        super(Component.literal("PeakClient Menu"));
+        super(Component.translatable("peakclient.menu.title"));
     }
 
     @Override
     public Component getTitle() {
         PeakMenuSettings settings = context.settings();
-        if (settings == null || settings.getTitle().isEmpty()) return super.getTitle();
-        return Component.literal(PeakPlaceholderResolver.resolve(settings.getTitle()));
+        String title = settings == null ? "" : settings.getTitle().getString();
+        if (title.isEmpty()) return super.getTitle();
+        return Component.literal(ChatFormatting.stripFormatting(PeakPlaceholderResolver.resolve(title)));
     }
 
     @Override

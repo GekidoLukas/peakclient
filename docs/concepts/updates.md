@@ -76,5 +76,5 @@ A reference to an element of another type is ignored with a warning.
 ## Good to know
 
 - An update for an unknown id or field is ignored and logged once.
-- A field that is bound to a value (see [Values and Placeholders](/concepts/values-and-placeholders)) is overwritten by
-  the binding. Call `unbind` first if you patch it.
+- Patching a field that is bound to a value (see [Values and Placeholders](/concepts/values-and-placeholders)) releases
+  the binding. The patched value stays. To keep the binding, send it again in the same patch.

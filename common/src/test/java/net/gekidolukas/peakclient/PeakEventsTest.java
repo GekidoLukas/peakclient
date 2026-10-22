@@ -55,7 +55,7 @@ class PeakEventsTest {
     }
 
     private static String text(PeakDocument document, String id) {
-        return ((PeakLabel) PeakClientUiState.model(document.getId()).find(id)).getText();
+        return ((PeakLabel) PeakClientUiState.model(document.getId()).find(id)).getText().getString();
     }
 
     private static void run(PeakDocument document) {

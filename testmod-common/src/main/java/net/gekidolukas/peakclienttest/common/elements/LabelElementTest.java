@@ -1,12 +1,19 @@
 package net.gekidolukas.peakclienttest.common.elements;
 
 import net.gekidolukas.peakclient.api.PeakClient;
+import net.gekidolukas.peakclient.server.PeakValueKey;
 import net.gekidolukas.peakclient.ui.*;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
 import net.gekidolukas.peakclienttest.common.PeakElementTest;
 import net.gekidolukas.peakclienttest.common.PeakElementTestStep;
 import net.gekidolukas.peakclienttest.common.PeakTestTimeline;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
@@ -32,7 +39,43 @@ public final class LabelElementTest implements PeakElementTest {
                 PeakElementTestStep.document("translation: key without arguments", 60, doc ->
                         doc.add(PeakLabel.translatable("gui.done").absolute(PeakAnchor.TOP_CENTER, 0, 10))),
                 PeakElementTestStep.document("translation: key with an argument (Seed: 1234)", 60, doc ->
-                        doc.add(PeakLabel.create("unused").translationKey("commands.seed.success", "1234").absolute(PeakAnchor.TOP_CENTER, 0, 10))),
+                        doc.add(PeakLabel.translatable("commands.seed.success", "1234").absolute(PeakAnchor.TOP_CENTER, 0, 10))),
+                PeakElementTestStep.document("components: red, bold green and plain parts in one label; Seed with a yellow Component argument; the jump key in aqua", 80, doc -> {
+                    doc.add(PeakLabel.create(Component.literal("Red ").withStyle(ChatFormatting.RED)
+                            .append(Component.literal("bold green").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD))
+                            .append(Component.literal(" and plain"))).absolute(PeakAnchor.TOP_CENTER, 0, 10));
+                    doc.add(PeakLabel.translatable("commands.seed.success", Component.literal("1234").withStyle(ChatFormatting.YELLOW))
+                            .absolute(PeakAnchor.TOP_CENTER, 0, 26));
+                    doc.add(PeakLabel.create(Component.keybind("key.jump").withStyle(ChatFormatting.AQUA)).absolute(PeakAnchor.TOP_CENTER, 0, 42));
+                }),
+                PeakElementTestStep.document("fonts: default, minecraft:alt (enchanting glyphs), minecraft:illageralt, minecraft:uniform", 100, doc -> {
+                    doc.add(PeakLabel.create(Component.literal("Default font")).absolute(PeakAnchor.TOP_CENTER, 0, 10));
+                    doc.add(PeakLabel.create(Component.literal("Alt font").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:alt"))))
+                            .absolute(PeakAnchor.TOP_CENTER, 0, 26));
+                    doc.add(PeakLabel.create(Component.literal("Illager font").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:illageralt"))))
+                            .absolute(PeakAnchor.TOP_CENTER, 0, 42));
+                    doc.add(PeakLabel.create(Component.literal("Uniform font ").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:uniform")))
+                            .append(Component.literal("then default again")))
+                            .absolute(PeakAnchor.TOP_CENTER, 0, 58));
+                }),
+                PeakElementTestStep.document("style inheritance: the bold parent keeps 'bold', the child with an explicit bold=false is thin, the last part is bold again", 100, doc ->
+                        doc.add(PeakLabel.create(Component.literal("Bold ").withStyle(ChatFormatting.BOLD)
+                                .append(Component.literal("thin ").withStyle(Style.EMPTY.withBold(false)))
+                                .append(Component.literal("bold again"))).absolute(PeakAnchor.TOP_CENTER, 0, 10))),
+                PeakElementTestStep.document("click, hover and insertion are removed: the link text is shown plain and nothing happens when clicked in a menu", 100, doc ->
+                        doc.add(PeakLabel.create(Component.literal("Looks like a link").withStyle(Style.EMPTY
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://example.org"))
+                                .withInsertion("inserted").withColor(ChatFormatting.AQUA))).absolute(PeakAnchor.TOP_CENTER, 0, 10))),
+                PeakElementTestStep.document("underline, strikethrough and obfuscated with shadow, plus an animated gradient over a bold underlined line", 120, doc -> {
+                    doc.add(PeakLabel.create(Component.literal("Underlined ").withStyle(ChatFormatting.UNDERLINE)
+                            .append(Component.literal("struck ").withStyle(ChatFormatting.STRIKETHROUGH))
+                            .append(Component.literal("obfuscated").withStyle(ChatFormatting.OBFUSCATED))).absolute(PeakAnchor.TOP_CENTER, 0, 10));
+                    doc.add(PeakLabel.create(Component.literal("Gradient bold underlined").withStyle(ChatFormatting.BOLD, ChatFormatting.UNDERLINE))
+                            .color(PeakPaint.gradient(0xFFFF5555, 0xFFFFFF55, 0xFF55FF55).animated(40))
+                            .absolute(PeakAnchor.TOP_CENTER, 0, 26));
+                }),
+                PeakElementTestStep.document("placeholder styles: your display name keeps its team color (join a team first), the gold text around it stays gold", 160, doc ->
+                        doc.add(PeakLabel.create("§6Hello {mc:player_display_name}§6, welcome!").absolute(PeakAnchor.TOP_CENTER, 0, 10))),
                 PeakElementTestStep.document("gradient: static, the end must be clearly blue", 60, doc ->
                         doc.add(PeakLabel.create("Static rainbow gradient")
                                 .color(PeakPaint.gradient(0xFFFF0000, 0xFF00FF00, 0xFF0000FF))
@@ -157,6 +200,23 @@ public final class LabelElementTest implements PeakElementTest {
                         int value = values[i];
                         timeline.atSeconds(1 + i * 1.5, () -> PeakClient.to(player).setValue("peaktest:score", value));
                     }
+                    timeline.start();
+                }),
+                PeakElementTestStep.of("component values: a PeakValueKey.ofComponent keeps its style, a translatable value follows the game language, the text around stays gold; after 3 s both change", 200, (player, docId) -> {
+                    PeakValueKey<Component> who = PeakValueKey.ofComponent("peaktest:who");
+                    PeakValueKey<Component> seed = PeakValueKey.ofComponent("peaktest:seed");
+                    PeakClient.to(player).setValue(who, Component.literal(player.getGameProfile().getName()).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                    PeakClient.to(player).setValue(seed, Component.translatable("commands.seed.success", Component.literal("1234").withStyle(ChatFormatting.YELLOW)));
+                    PeakDocument doc = PeakDocument.create(docId);
+                    doc.add(PeakLabel.create("§6Hello " + who.placeholder() + "§6, welcome!").absolute(PeakAnchor.TOP_LEFT, 20, 20));
+                    doc.add(PeakLabel.create(seed.placeholder()).absolute(PeakAnchor.TOP_LEFT, 20, 34));
+                    doc.add(PeakLabel.create("Missing value: {peaktest:nothing#fallback text}").absolute(PeakAnchor.TOP_LEFT, 20, 48));
+                    PeakClient.to(player).sendUi(doc);
+                    PeakTestTimeline timeline = PeakTestTimeline.create(player);
+                    timeline.atSeconds(3, () -> {
+                        PeakClient.to(player).setValue(who, Component.literal("Someone Else").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:alt"))));
+                        PeakClient.to(player).setValue(seed, Component.translatable("gui.done").withStyle(ChatFormatting.GREEN));
+                    });
                     timeline.start();
                 }),
                 PeakElementTestStep.document("typewriter: 20 chars per second (top), 60 with a wrap width and a gradient that must not squeeze (middle), colored (bottom)", 260, doc -> {

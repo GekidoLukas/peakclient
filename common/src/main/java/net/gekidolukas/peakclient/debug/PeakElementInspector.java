@@ -173,7 +173,9 @@ public final class PeakElementInspector {
         if (interaction != null) {
             lines.add(kv("interaction", (interaction.isEnabled() ? "enabled" : "disabled") + ", "
                     + element.getEvents().size() + " event(s)"));
-            if (!interaction.getTooltip().isEmpty()) lines.add(kv("tooltip", "\"" + interaction.getTooltip().replace('\n', '|') + "\""));
+            if (!interaction.getTooltip().getString().isEmpty()) {
+                lines.add(kv("tooltip", "\"" + interaction.getTooltip().getString().replace('\n', '|') + "\""));
+            }
             if (interaction.isKeepFocus()) lines.add(kv("keepFocus", "true"));
             if (!interaction.getFocusColor().isNone() || interaction.getFocusWidth() > 0) {
                 lines.add(kv("focus ring", paint(interaction.getFocusColor()) + " width " + interaction.getFocusWidth()));

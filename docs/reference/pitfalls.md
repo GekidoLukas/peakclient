@@ -34,7 +34,8 @@ so a half transparent border over a dark panel looks darker. See [Box Style](/st
 
 ## Bound fields
 
-A field bound to a value is overwritten by the binding. Call `unbind` before you patch it.
+Patching a field that is bound to a value releases the binding, so the value no longer follows the placeholder. If the
+binding should stay, send it again in the same patch (`bind`).
 
 ## Large rankings
 

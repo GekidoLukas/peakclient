@@ -29,7 +29,7 @@ class PeakItemSlotTest {
         assertTrue(slot.isShowDurability());
         assertTrue(slot.isItemTooltip());
         assertFalse(slot.isSelected());
-        assertEquals("", slot.getCountText());
+        assertEquals("", slot.getCountText().getString());
         assertEquals("item_slot", slot.elementType());
     }
 
@@ -42,7 +42,7 @@ class PeakItemSlotTest {
 
         assertFalse(slot.isShowCount());
         assertFalse(slot.isShowDurability());
-        assertEquals("x3", slot.getCountText());
+        assertEquals("x3", slot.getCountText().getString());
         assertTrue(slot.isSelected());
         assertFalse(slot.isItemTooltip());
         assertEquals("pick", slot.actionsFor(PeakEvent.CLICK).get(0).target());
@@ -57,7 +57,7 @@ class PeakItemSlotTest {
         slot.applyPatch(PeakPatch.itemSlot().selected(true).countText("12g").showCount(false).build());
 
         assertTrue(slot.isSelected());
-        assertEquals("12g", slot.getCountText());
+        assertEquals("12g", slot.getCountText().getString());
         assertFalse(slot.isShowCount());
         assertTrue(slot.isPatchKeyKnown("source"));
         assertTrue(slot.isPatchKeyKnown("itemTooltip"));

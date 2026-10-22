@@ -24,6 +24,7 @@ import net.gekidolukas.peakclient.ui.template.PeakCollapsible;
 import net.gekidolukas.peakclient.ui.template.PeakFormField;
 import net.gekidolukas.peakclient.ui.template.PeakPagedList;
 import net.gekidolukas.peakclient.ui.template.PeakSeparator;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -96,7 +97,7 @@ class PeakTemplatesPhase5Test {
 
         assertTrue(first.isChecked());
         assertFalse(second.isChecked());
-        assertEquals("Speed", first.getText());
+        assertEquals("Speed", first.getText().getString());
         PeakAction action = first.actionsFor(PeakEvent.CHANGE).get(0);
         assertEquals("perk", action.target());
         assertEquals("speed", action.args().get(PeakCheckList.OPTION_ARG));
@@ -112,11 +113,11 @@ class PeakTemplatesPhase5Test {
         PeakLabel label = (PeakLabel) menu.findById("ns:name/label");
         PeakLabel error = (PeakLabel) menu.findById("ns:name/error");
 
-        assertTrue(label.getText().startsWith("Name"));
-        assertTrue(label.getText().contains("*"));
-        assertEquals("3 to 16 letters", ((PeakLabel) menu.findById("ns:name/hint")).getText());
+        assertTrue(label.getText().getString().startsWith("Name"));
+        assertTrue(label.getText().getString().contains("*"));
+        assertEquals("3 to 16 letters", ((PeakLabel) menu.findById("ns:name/hint")).getText().getString());
         assertTrue(error.isHidden());
-        assertEquals(PeakFormField.REQUIRED_MESSAGE, error.getText());
+        assertEquals(PeakFormField.REQUIRED_KEY, assertInstanceOf(TranslatableContents.class, error.getText().getContents()).getKey());
         assertTrue(input.getInteraction().isRequired());
         assertEquals("ns:name/error", input.getInteraction().getErrorElement());
     }
@@ -248,7 +249,7 @@ class PeakTemplatesPhase5Test {
         PeakPagedList list = PeakPagedList.remote("ns:list", 2).loadingText("Wait");
 
         assertInstanceOf(PeakLabel.class, list.loadingElement(0));
-        assertEquals("Wait", ((PeakLabel) list.loadingElement(0)).getText());
+        assertEquals("Wait", ((PeakLabel) list.loadingElement(0)).getText().getString());
     }
 
     @Test

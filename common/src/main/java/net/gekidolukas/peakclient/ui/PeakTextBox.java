@@ -1,10 +1,12 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 public final class PeakTextBox extends PeakElement<PeakTextBox> implements PeakInput {
     public static final int MAX_LENGTH_LIMIT = 256;
 
     private String value = "";
-    private String placeholder = "";
+    private Component placeholder = Component.empty();
     private int maxLength = 64;
     private PeakTextFilter filter = PeakTextFilter.ANY;
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
@@ -26,8 +28,9 @@ public final class PeakTextBox extends PeakElement<PeakTextBox> implements PeakI
     public String getValue() { return value == null ? "" : value; }
     public PeakTextBox value(String value) { this.value = value == null ? "" : value; return this; }
 
-    public String getPlaceholder() { return placeholder == null ? "" : placeholder; }
-    public PeakTextBox placeholder(String placeholder) { this.placeholder = placeholder == null ? "" : placeholder; return this; }
+    public Component getPlaceholder() { return placeholder == null ? Component.empty() : placeholder; }
+    public PeakTextBox placeholder(String placeholder) { return placeholder(Component.literal(placeholder == null ? "" : placeholder)); }
+    public PeakTextBox placeholder(Component placeholder) { this.placeholder = placeholder == null ? Component.empty() : placeholder; return this; }
 
     public int getMaxLength() { return Math.max(1, Math.min(maxLength, MAX_LENGTH_LIMIT)); }
     public PeakTextBox maxLength(int maxLength) { this.maxLength = Math.max(1, Math.min(maxLength, MAX_LENGTH_LIMIT)); return this; }

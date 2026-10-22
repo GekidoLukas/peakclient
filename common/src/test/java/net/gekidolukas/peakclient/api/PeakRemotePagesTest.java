@@ -71,7 +71,7 @@ class PeakRemotePagesTest {
             assertNotNull(menu.findById(PeakPagedList.pageId(LIST, page)));
             assertNotNull(menu.findById(PeakPagedList.contentId(LIST, page)));
             PeakLabel loading = (PeakLabel) menu.findById(PeakPagedList.loadingId(LIST, page));
-            assertEquals("Please wait", loading.getText());
+            assertEquals("Please wait", loading.getText().getString());
         }
         assertFalse(menu.findById(PeakPagedList.pageId(LIST, 0)).isHidden());
         assertTrue(menu.findById(PeakPagedList.pageId(LIST, 1)).isHidden());

@@ -18,6 +18,7 @@ public final class PeakOcclusion {
     private int checkIntervalTicks = 3;
     private boolean ignoreTarget = true;
     private float depthBias = 0.6f;
+    private float translucentAlpha = 0.6f;
 
     public static PeakOcclusion none() { return new PeakOcclusion().mode(Mode.NONE); }
     public static PeakOcclusion partial() { return new PeakOcclusion().mode(Mode.PARTIAL); }
@@ -55,6 +56,9 @@ public final class PeakOcclusion {
 
     public float getDepthBias() { return Math.max(0f, depthBias); }
     public PeakOcclusion depthBias(float blocks) { this.depthBias = Math.max(0f, blocks); return this; }
+
+    public float getTranslucentAlpha() { return Math.max(0f, Math.min(1f, translucentAlpha)); }
+    public PeakOcclusion translucentAlpha(float alpha) { this.translucentAlpha = Math.max(0f, Math.min(1f, alpha)); return this; }
 
     public boolean isEnabled() { return getMode() != Mode.NONE; }
     public boolean isPartial() { return getMode() == Mode.PARTIAL; }

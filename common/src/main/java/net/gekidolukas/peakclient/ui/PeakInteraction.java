@@ -1,10 +1,12 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 public final class PeakInteraction {
     private boolean enabled = true;
     private boolean silent = false;
     private boolean keepFocus = false;
-    private String tooltip = "";
+    private Component tooltip = Component.empty();
     private PeakElement<?> tooltipElement;
     private boolean elementTooltip = false;
     private PeakStyle hoverStyle;
@@ -32,9 +34,10 @@ public final class PeakInteraction {
     public boolean isKeepFocus() { return keepFocus; }
     public PeakInteraction keepFocus(boolean keep) { this.keepFocus = keep; return this; }
 
-    public String getTooltip() { return tooltip == null ? "" : tooltip; }
-    public PeakInteraction tooltip(String tooltip) {
-        this.tooltip = tooltip == null ? "" : tooltip;
+    public Component getTooltip() { return tooltip == null ? Component.empty() : tooltip; }
+    public PeakInteraction tooltip(String tooltip) { return tooltip(Component.literal(tooltip == null ? "" : tooltip)); }
+    public PeakInteraction tooltip(Component tooltip) {
+        this.tooltip = tooltip == null ? Component.empty() : tooltip;
         this.tooltipElement = null;
         this.elementTooltip = false;
         return this;
@@ -44,12 +47,12 @@ public final class PeakInteraction {
     public PeakInteraction tooltip(PeakElement<?> element) {
         this.tooltipElement = element;
         this.elementTooltip = element != null;
-        this.tooltip = "";
+        this.tooltip = Component.empty();
         return this;
     }
 
     public boolean hasTooltip() {
-        return getTooltipElement() != null || !getTooltip().isEmpty();
+        return getTooltipElement() != null || !getTooltip().getString().isEmpty();
     }
 
     public PeakStyle getHoverStyle() { return hoverStyle; }

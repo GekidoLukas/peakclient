@@ -1,6 +1,8 @@
 package net.gekidolukas.peakclient.server;
 
 import net.gekidolukas.peakclient.ui.PeakId;
+import net.gekidolukas.peakclient.ui.serialize.PeakComponentValue;
+import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
 import java.util.function.Function;
@@ -28,6 +30,7 @@ public final class PeakValueKey<T> {
     public static PeakValueKey<String> ofString(String namespacedKey) { return of(namespacedKey, Function.identity()); }
     public static PeakValueKey<Integer> ofInt(String namespacedKey) { return of(namespacedKey, String::valueOf); }
     public static PeakValueKey<Long> ofLong(String namespacedKey) { return of(namespacedKey, String::valueOf); }
+    public static PeakValueKey<Component> ofComponent(String namespacedKey) { return of(namespacedKey, PeakComponentValue::encode); }
     public static PeakValueKey<Boolean> ofBoolean(String namespacedKey) { return of(namespacedKey, String::valueOf); }
     public static PeakValueKey<Double> ofDouble(String namespacedKey, String format) {
         return of(namespacedKey, value -> String.format(Locale.ROOT, format, value));

@@ -3,6 +3,7 @@ package net.gekidolukas.peakclient.render;
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakCompass;
 import net.gekidolukas.peakclient.ui.PeakCompassOverlapMode;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakCompassStackDirection;
 import net.gekidolukas.peakclient.ui.PeakCompassTickPosition;
 import net.gekidolukas.peakclient.ui.PeakEntityTrackingMode;
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.network.chat.Style;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -83,13 +85,13 @@ public final class PeakCompassRenderer implements PeakElementRenderer<PeakCompas
     @Override
     public PeakPixelSize measureContent(Font font, PeakCompass compass) { return PeakPixelSize.ZERO; }
 
-    private record RawWaypointEntry(PeakWaypoint waypoint, double distance, int x, String label) {}
+    private record RawWaypointEntry(PeakWaypoint waypoint, double distance, int x, PeakStyledText label) {}
 
     private static final class WaypointCandidate {
         final PeakWaypoint representative;
         final double distance;
         int x;
-        String labelText;
+        PeakStyledText labelText = PeakStyledText.EMPTY;
         int labelWidth;
         int left, right;
         int clusterId = -1;
@@ -124,7 +126,7 @@ public final class PeakCompassRenderer implements PeakElementRenderer<PeakCompas
             if (Math.abs(relative) > halfFov) continue;
 
             int x = Math.round(width / 2f + (relative / halfFov) * (width / 2f));
-            String label = PeakPlaceholderResolver.resolve(resolveWaypointLabel(waypoint, mc));
+            PeakStyledText label = resolveWaypointLabel(waypoint, mc);
             raw.add(new RawWaypointEntry(waypoint, distance, x, label));
         }
         if (raw.isEmpty()) return;
@@ -136,7 +138,7 @@ public final class PeakCompassRenderer implements PeakElementRenderer<PeakCompas
         int markerSize = compass.getWaypointIconSize();
         int spacing = Math.max(1, compass.getStackSpacing());
         for (WaypointCandidate candidate : candidates) {
-            candidate.labelWidth = font.width(candidate.labelText);
+            candidate.labelWidth = candidate.labelText.width(font);
             int halfWidth = Math.max(markerSize, candidate.labelWidth) / 2 + spacing;
             candidate.left = candidate.x - halfWidth;
             candidate.right = candidate.x + halfWidth;
@@ -270,21 +272,25 @@ public final class PeakCompassRenderer implements PeakElementRenderer<PeakCompas
         return null;
     }
 
-    private static String resolveWaypointLabel(PeakWaypoint waypoint, Minecraft mc) {
+    private static PeakStyledText waypointLabel(PeakWaypoint waypoint, String fallback) {
+        return waypoint.getLabel() == null ? PeakStyledText.ofLegacy(fallback) : PeakTextResolver.resolved(waypoint, waypoint.getLabel());
+    }
+
+    private static PeakStyledText resolveWaypointLabel(PeakWaypoint waypoint, Minecraft mc) {
         if (waypoint.getEntityTrackingMode() != PeakEntityTrackingMode.NONE && waypoint.getTrackedEntityUuid() != null) {
             Entity tracked = resolveEntityByUuid(mc, waypoint.getTrackedEntityUuid());
             if (tracked != null) {
-                return tracked.getDisplayName().getString();
+                return PeakStyledText.of(tracked.getDisplayName());
             }
-            return waypoint.getLabel() != null ? waypoint.getLabel() : "?";
+            return waypointLabel(waypoint, "?");
         }
-        return waypoint.getLabel() != null ? waypoint.getLabel() : "";
+        return waypointLabel(waypoint, "");
     }
 
     private static List<WaypointCandidate> mergeByNameAndProximity(List<RawWaypointEntry> raw, int mergeDistance) {
         Map<String, List<RawWaypointEntry>> byName = new LinkedHashMap<>();
         for (RawWaypointEntry entry : raw) {
-            String key = (entry.label() != null && !entry.label().isEmpty()) ? entry.label() : ("#" + entry.waypoint().getId());
+            String key = (entry.label() != null && !entry.label().isEmpty()) ? entry.label().plain() : ("#" + entry.waypoint().getId());
             byName.computeIfAbsent(key, name -> new ArrayList<>()).add(entry);
         }
 
@@ -315,12 +321,17 @@ public final class PeakCompassRenderer implements PeakElementRenderer<PeakCompas
             xSum += entry.x();
             if (entry.distance() < nearest.distance()) nearest = entry;
         }
-        String label = run.size() > 1 ? nearest.label() + " x" + run.size() : nearest.label();
+        PeakStyledText label = run.size() > 1 ? withCount(nearest.label(), run.size()) : nearest.label();
 
         WaypointCandidate candidate = new WaypointCandidate(nearest.waypoint(), nearest.distance());
         candidate.x = xSum / run.size();
-        candidate.labelText = label != null ? label : "";
+        candidate.labelText = label != null ? label : PeakStyledText.EMPTY;
         return candidate;
+    }
+
+    private static PeakStyledText withCount(PeakStyledText label, int count) {
+        Style style = label.isEmpty() ? Style.EMPTY : label.styleAt(label.length() - 1);
+        return label.concat(PeakStyledText.of(" x" + count, style));
     }
 
     private static List<WaypointCandidate> rawToCandidate(List<RawWaypointEntry> raw) {
@@ -328,7 +339,7 @@ public final class PeakCompassRenderer implements PeakElementRenderer<PeakCompas
         for (RawWaypointEntry entry : raw) {
             WaypointCandidate candidate = new WaypointCandidate(entry.waypoint(), entry.distance());
             candidate.x = entry.x();
-            candidate.labelText = entry.label() != null ? entry.label() : "";
+            candidate.labelText = entry.label() != null ? entry.label() : PeakStyledText.EMPTY;
             result.add(candidate);
         }
         return result;

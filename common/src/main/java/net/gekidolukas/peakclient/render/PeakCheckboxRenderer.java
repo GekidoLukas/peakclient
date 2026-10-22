@@ -2,6 +2,7 @@ package net.gekidolukas.peakclient.render;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakCheckbox;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakCheckboxLook;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.client.PeakMenuInteractionState;
@@ -16,11 +17,11 @@ public final class PeakCheckboxRenderer implements PeakElementRenderer<PeakCheck
 
     @Override
     public PeakPixelSize measureContent(Font font, PeakCheckbox checkbox) {
-        String text = checkbox.getText();
+        PeakStyledText text = PeakTextResolver.resolved(checkbox, checkbox.getText());
         boolean asSwitch = checkbox.getLook() == PeakCheckboxLook.SWITCH;
         int markWidth = asSwitch ? SWITCH_WIDTH : BOX;
         int markHeight = asSwitch ? SWITCH_HEIGHT : BOX;
-        int width = markWidth + (text.isEmpty() ? 0 : GAP + font.width(text));
+        int width = markWidth + (text.isEmpty() ? 0 : GAP + text.width(font));
         return new PeakPixelSize(width, Math.max(markHeight, font.lineHeight));
     }
 
@@ -51,7 +52,7 @@ public final class PeakCheckboxRenderer implements PeakElementRenderer<PeakCheck
             }
         }
 
-        String text = checkbox.getText();
+        PeakStyledText text = PeakTextResolver.resolved(checkbox, checkbox.getText());
         if (!text.isEmpty()) {
             int textY = Math.max(0, (height - font.lineHeight) / 2) + 1;
             PeakImmediateRender.text(graphics, font, text, markWidth + GAP, textY, enabled ? checkbox.getColor() : PeakPaint.solid(PeakInputColors.TEXT_DISABLED), true);

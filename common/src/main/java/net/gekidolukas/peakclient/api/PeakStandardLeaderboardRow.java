@@ -5,6 +5,7 @@ import net.gekidolukas.peakclient.ui.PeakElement;
 import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
+import net.minecraft.network.chat.Component;
 
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -57,6 +58,10 @@ public final class PeakStandardLeaderboardRow<K> implements PeakLeaderboardRow<K
     }
 
     public PeakPanel panel(String id, String rankText, String nameText, String scoreText) {
+        return panel(id, rankText, Component.literal(nameText == null ? "" : nameText), scoreText);
+    }
+
+    public PeakPanel panel(String id, String rankText, Component nameText, String scoreText) {
         PeakPanel panel = PeakPanel.create(id).row().gap(4).padding(2, 4).background(DEFAULT_BACKGROUND);
         style.accept(panel);
         panel.add(PeakLabel.create(rankId(id), rankText).width(rankWidth),

@@ -17,6 +17,7 @@ import net.gekidolukas.peakclient.ui.PeakUiOperation;
 import net.gekidolukas.peakclient.ui.PeakWaypoint;
 import net.gekidolukas.peakclient.ui.patch.PeakBasePatch;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -230,11 +231,25 @@ public final class PeakTargets {
         notify(text, animation, PeakPaint.solid(color), timeToLiveTicks);
     }
 
+    public void notify(Component text) {
+        notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, PeakPaint.solid(0xFFFFFF), 60);
+    }
+
+    public void notify(Component text, PeakPopupAnimation animation, PeakPaint color, int timeToLiveTicks) {
+        PeakHud.notify(ids(), text, animation, color, timeToLiveTicks);
+    }
+
     public void notifySuccess(String text) { notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, 0x55FF55, 60); }
 
     public void notifyWarning(String text) { notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, 0xFFAA00, 60); }
 
     public void notifyError(String text) { notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, 0xFF5555, 60); }
+
+    public void notifySuccess(Component text) { notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, PeakPaint.solid(0x55FF55), 60); }
+
+    public void notifyWarning(Component text) { notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, PeakPaint.solid(0xFFAA00), 60); }
+
+    public void notifyError(Component text) { notify(text, PeakPopupAnimation.SLIDE_FROM_RIGHT, PeakPaint.solid(0xFF5555), 60); }
 
     public PeakPopupBuilder popup() {
         return new PeakPopupBuilder(this);

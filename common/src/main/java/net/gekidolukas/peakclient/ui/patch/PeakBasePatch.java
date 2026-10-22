@@ -17,7 +17,9 @@ import net.gekidolukas.peakclient.ui.PeakPositionMode;
 import net.gekidolukas.peakclient.ui.PeakScrollbarStyle;
 import net.gekidolukas.peakclient.ui.PeakSize;
 import net.gekidolukas.peakclient.ui.PeakStyle;
+import net.gekidolukas.peakclient.ui.serialize.PeakComponentAdapter;
 import net.gekidolukas.peakclient.ui.serialize.PeakUiSerializer;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -79,6 +81,11 @@ public abstract class PeakBasePatch<SELF extends PeakBasePatch<SELF>> {
     public SELF enabled(boolean enabled) { data.addProperty("interaction.enabled", enabled); return self(); }
     public SELF tooltip(String tooltip) {
         data.addProperty("interaction.tooltip", tooltip);
+        data.addProperty("interaction.elementTooltip", false);
+        return self();
+    }
+    public SELF tooltip(Component tooltip) {
+        data.add("interaction.tooltip", PeakComponentAdapter.toTree(tooltip));
         data.addProperty("interaction.elementTooltip", false);
         return self();
     }

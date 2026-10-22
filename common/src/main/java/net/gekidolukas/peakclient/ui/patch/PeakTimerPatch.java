@@ -1,9 +1,11 @@
 package net.gekidolukas.peakclient.ui.patch;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
+import net.gekidolukas.peakclient.ui.serialize.PeakComponentAdapter;
 import net.gekidolukas.peakclient.ui.serialize.PeakPaintAdapter;
 import net.gekidolukas.peakclient.ui.PeakTimerFormat;
 import net.gekidolukas.peakclient.ui.PeakTimerMode;
+import net.minecraft.network.chat.Component;
 
 public final class PeakTimerPatch extends PeakBasePatch<PeakTimerPatch> {
     public PeakTimerPatch value(long value) { data.addProperty("value", value); return this; }
@@ -13,6 +15,8 @@ public final class PeakTimerPatch extends PeakBasePatch<PeakTimerPatch> {
     public PeakTimerPatch format(PeakTimerFormat format) { data.addProperty("format", format.name()); return this; }
     public PeakTimerPatch prefix(String prefix) { data.addProperty("prefix", prefix); return this; }
     public PeakTimerPatch suffix(String suffix) { data.addProperty("suffix", suffix); return this; }
+    public PeakTimerPatch prefix(Component prefix) { data.add("prefix", PeakComponentAdapter.toTree(prefix)); return this; }
+    public PeakTimerPatch suffix(Component suffix) { data.add("suffix", PeakComponentAdapter.toTree(suffix)); return this; }
     public PeakTimerPatch color(int argb) { data.addProperty("color", argb); return this; }
     public PeakTimerPatch color(PeakPaint paint) { data.add("color", PeakPaintAdapter.toTree(paint)); return this; }
     public PeakTimerPatch shadow(boolean shadow) { data.addProperty("shadow", shadow); return this; }

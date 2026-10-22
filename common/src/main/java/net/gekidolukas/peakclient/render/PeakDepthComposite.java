@@ -24,7 +24,8 @@ final class PeakDepthComposite {
 
     private PeakDepthComposite() {}
 
-    static void present(Minecraft minecraft, GuiGraphics graphics, float ndcZ, float visibleAlpha, float hiddenAlpha) {
+    static void present(Minecraft minecraft, GuiGraphics graphics, float ndcZ, float visibleAlpha, float hiddenAlpha,
+                        float translucentAlpha) {
         if (!PeakOffscreenOpacity.closeBuffer(graphics)) return;
         TextureTarget content = PeakOffscreenOpacity.contentTarget();
         TextureTarget world = PeakDepthCapture.target();
@@ -34,7 +35,8 @@ final class PeakDepthComposite {
 
         boolean scissor = GL11.glIsEnabled(GL11.GL_SCISSOR_TEST);
         if (scissor) GlStateManager._disableScissorTest();
-        main.copyDepthFrom(world);
+        boolean seeThrough = translucentAlpha > MIN_ALPHA && PeakDepthCapture.hasOpaque() && PeakDepthCapture.opaqueTarget() != null;
+        main.copyDepthFrom(seeThrough ? PeakDepthCapture.opaqueTarget() : world);
         main.bindWrite(true);
         if (scissor) GlStateManager._enableScissorTest();
 
@@ -55,11 +57,29 @@ final class PeakDepthComposite {
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(false);
             RenderSystem.disableCull();
+            if (seeThrough) {
+                if (visibleAlpha * translucentAlpha > MIN_ALPHA) {
+                    RenderSystem.depthFunc(DEPTH_LEQUAL);
+                    drawQuad(clampedZ, visibleAlpha * translucentAlpha);
+                }
+                if (hiddenAlpha > MIN_ALPHA) {
+                    RenderSystem.depthFunc(DEPTH_GREATER);
+                    drawQuad(clampedZ, hiddenAlpha * visibleAlpha);
+                }
+                if (scissor) GlStateManager._disableScissorTest();
+                main.copyDepthFrom(world);
+                main.bindWrite(true);
+                if (scissor) GlStateManager._enableScissorTest();
+                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShaderTexture(0, content.getColorTextureId());
+                RenderSystem.enableDepthTest();
+                RenderSystem.depthMask(false);
+            }
             if (visibleAlpha > MIN_ALPHA) {
                 RenderSystem.depthFunc(DEPTH_LEQUAL);
                 drawQuad(clampedZ, visibleAlpha);
             }
-            if (hiddenAlpha > MIN_ALPHA) {
+            if (hiddenAlpha > MIN_ALPHA && !seeThrough) {
                 RenderSystem.depthFunc(DEPTH_GREATER);
                 drawQuad(clampedZ, hiddenAlpha * visibleAlpha);
             }

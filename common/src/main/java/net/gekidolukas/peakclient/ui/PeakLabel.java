@@ -1,19 +1,13 @@
 package net.gekidolukas.peakclient.ui;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.gekidolukas.peakclient.ui.serialize.PeakUiSerializer;
+import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public final class PeakLabel extends PeakElement<PeakLabel> {
-    private String text;
-    private String translationKey;
-    private List<String> translationArgs = new ArrayList<>();
+    private Component text;
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
     private boolean shadow = true;
     private int wrapWidth = 0;
@@ -25,34 +19,25 @@ public final class PeakLabel extends PeakElement<PeakLabel> {
 
     public PeakLabel(String text) { this(PeakId.random(), text); }
 
-    public PeakLabel(String id, String text) {
+    public PeakLabel(String id, String text) { this(id, Component.literal(text == null ? "" : text)); }
+
+    public PeakLabel(String id, Component text) {
         super(id);
-        this.text = text;
+        this.text = text == null ? Component.empty() : text;
     }
 
     public static PeakLabel create(String text) { return new PeakLabel(text); }
-    public static PeakLabel create(String id,String text) { return new PeakLabel(id,text); }
+    public static PeakLabel create(String id, String text) { return new PeakLabel(id, text); }
+    public static PeakLabel create(Component text) { return new PeakLabel(PeakId.random(), text); }
+    public static PeakLabel create(String id, Component text) { return new PeakLabel(id, text); }
 
-    public static PeakLabel translatable(String key, String... args) {
-        PeakLabel label = new PeakLabel(PeakId.random(), "");
-        return label.translationKey(key, args);
+    public static PeakLabel translatable(String key, Object... args) {
+        return new PeakLabel(PeakId.random(), Component.translatable(key, args));
     }
 
-    public static PeakLabel translatable(String id, String key, String... args) {
-        PeakLabel label = new PeakLabel(id, "");
-        return label.translationKey(key, args);
-    }
-
-    public String getText() { return text; }
-    public PeakLabel text(String text) { this.text = text; this.translationKey = null; return this; }
-
-    public String getTranslationKey() { return translationKey; }
-    public List<String> getTranslationArgs() { return translationArgs; }
-    public PeakLabel translationKey(String key, String... args) {
-        this.translationKey = key;
-        this.translationArgs = List.of(args);
-        return this;
-    }
+    public Component getText() { return text; }
+    public PeakLabel text(String text) { this.text = Component.literal(text == null ? "" : text); return this; }
+    public PeakLabel text(Component text) { this.text = text == null ? Component.empty() : text; return this; }
 
     public PeakPaint getColor() { return color; }
     public PeakLabel color(PeakPaint paint) { this.color = paint.opaque(); return this; }
@@ -95,11 +80,5 @@ public final class PeakLabel extends PeakElement<PeakLabel> {
             return;
         }
         super.applyCustomPatch(key, value);
-    }
-
-    @Override
-    protected void afterPatch(JsonObject patch) {
-        if (patch.has("text") && !patch.has("translationKey")) this.translationKey = null;
-        if (patch.has("translationKey") && !patch.has("translationArgs")) this.translationArgs = new ArrayList<>();
     }
 }

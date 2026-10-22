@@ -3,6 +3,7 @@ package net.gekidolukas.peakclient.ui;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import net.gekidolukas.peakclient.ui.serialize.PeakUiSerializer;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,16 @@ public final class PeakBarChart extends PeakElement<PeakBarChart> {
         return this;
     }
     public PeakBarChart addEntry(String label, double value, PeakPaint color) {
+        entries.add(PeakChartEntry.of(label, value, color));
+        return this;
+    }
+
+    public PeakBarChart addEntry(Component label, double value, int color) {
+        entries.add(PeakChartEntry.of(label, value, color));
+        return this;
+    }
+
+    public PeakBarChart addEntry(Component label, double value, PeakPaint color) {
         entries.add(PeakChartEntry.of(label, value, color));
         return this;
     }

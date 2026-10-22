@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +26,8 @@ public final class PeakRadioGroup extends PeakElement<PeakRadioGroup> implements
     public List<PeakOption> getOptions() { return options == null ? List.of() : options; }
     public PeakRadioGroup option(String value, String text) { return option(PeakOption.of(value, text)); }
     public PeakRadioGroup option(String value, String text, boolean enabled) { return option(PeakOption.of(value, text, enabled)); }
+    public PeakRadioGroup option(String value, Component text) { return option(PeakOption.of(value, text)); }
+    public PeakRadioGroup option(String value, Component text, boolean enabled) { return option(PeakOption.of(value, text, enabled)); }
     public PeakRadioGroup option(PeakOption option) {
         if (options == null) options = new ArrayList<>();
         options.add(option);

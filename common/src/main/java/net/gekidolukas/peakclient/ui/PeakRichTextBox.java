@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -8,7 +10,7 @@ public final class PeakRichTextBox extends PeakElement<PeakRichTextBox> implemen
     public static final int MAX_LENGTH_LIMIT = 2000;
 
     private String value = "";
-    private String placeholder = "";
+    private Component placeholder = Component.empty();
     private int maxLength = 512;
     private int maxLines = 0;
     private boolean wrap = true;
@@ -43,8 +45,9 @@ public final class PeakRichTextBox extends PeakElement<PeakRichTextBox> implemen
     public String getValue() { return value == null ? "" : value; }
     public PeakRichTextBox value(String value) { this.value = value == null ? "" : value; return this; }
 
-    public String getPlaceholder() { return placeholder == null ? "" : placeholder; }
-    public PeakRichTextBox placeholder(String placeholder) { this.placeholder = placeholder == null ? "" : placeholder; return this; }
+    public Component getPlaceholder() { return placeholder == null ? Component.empty() : placeholder; }
+    public PeakRichTextBox placeholder(String placeholder) { return placeholder(Component.literal(placeholder == null ? "" : placeholder)); }
+    public PeakRichTextBox placeholder(Component placeholder) { this.placeholder = placeholder == null ? Component.empty() : placeholder; return this; }
 
     public int getMaxLength() { return Math.max(1, Math.min(maxLength, MAX_LENGTH_LIMIT)); }
     public PeakRichTextBox maxLength(int maxLength) { this.maxLength = Math.max(1, Math.min(maxLength, MAX_LENGTH_LIMIT)); return this; }

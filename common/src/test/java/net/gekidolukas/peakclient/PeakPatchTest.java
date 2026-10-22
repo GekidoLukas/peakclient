@@ -4,6 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.gekidolukas.peakclient.ui.*;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
+import net.gekidolukas.peakclient.ui.serialize.PeakUiSerializer;
+import net.minecraft.network.chat.contents.PlainTextContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,19 +24,28 @@ class PeakPatchTest {
     }
 
     @Test
-    void labelTextPatchClearsTranslationKey() {
+    void aTextPatchReplacesATranslatableLabelWithPlainText() {
         PeakLabel label = PeakLabel.translatable("gui.done");
+        assertInstanceOf(TranslatableContents.class, label.getText().getContents());
         label.applyPatch(patch("text", "Hello"));
-        assertEquals("Hello", label.getText());
-        assertNull(label.getTranslationKey());
+        assertEquals("Hello", label.getText().getString());
+        assertInstanceOf(PlainTextContents.class, label.getText().getContents());
     }
 
     @Test
-    void labelTranslationKeyWithoutArgsResetsArgs() {
+    void aTextPatchCanCarryATranslatableComponent() {
         PeakLabel label = PeakLabel.create("x");
-        label.applyPatch(patch("translationKey", "gui.cancel"));
-        assertEquals("gui.cancel", label.getTranslationKey());
-        assertTrue(label.getTranslationArgs().isEmpty());
+        JsonObject text = new JsonObject();
+        text.addProperty("translate", "gui.cancel");
+        JsonArray with = new JsonArray();
+        with.add("a");
+        text.add("with", with);
+        JsonObject patch = new JsonObject();
+        patch.add("text", text);
+        label.applyPatch(patch);
+        TranslatableContents contents = assertInstanceOf(TranslatableContents.class, label.getText().getContents());
+        assertEquals("gui.cancel", contents.getKey());
+        assertArrayEquals(new Object[]{"a"}, contents.getArgs());
     }
 
     @Test
@@ -136,6 +148,74 @@ class PeakPatchTest {
         unbind.add("unbindings", removed);
         label.applyPatch(unbind);
         assertTrue(label.getBindings().isEmpty());
+    }
+
+    @Test
+    void patchingABoundFieldReleasesItsBinding() {
+        PeakLabel label = PeakLabel.create("x").bind("opacity", "{a:b}").bind("hidden", "{a:c}");
+        label.applyPatch(patch("opacity", 0.5f));
+        assertFalse(label.getBindings().containsKey("opacity"));
+        assertEquals("{a:c}", label.getBindings().get("hidden"));
+        assertEquals(0.5f, label.getOpacity());
+        assertTrue(label.consumeReleasedBinding("opacity"));
+        assertFalse(label.consumeReleasedBinding("opacity"));
+    }
+
+    @Test
+    void patchingAParentObjectReleasesTheBindingsBelowIt() {
+        PeakPanel panel = PeakPanel.create("x").bind("style.background", "{a:b}").bind("style.borderRadius", "{a:r}")
+                .bind("opacity", "{a:o}");
+        JsonObject patch = new JsonObject();
+        patch.add("style", PeakUiSerializer.GSON.toJsonTree(PeakStyle.create()));
+        panel.applyPatch(patch);
+        assertEquals(java.util.Set.of("opacity"), panel.getBindings().keySet());
+    }
+
+    @Test
+    void aDottedPatchReleasesOnlyTheNamedBinding() {
+        PeakPanel panel = PeakPanel.create("x").bind("style.background", "{a:b}").bind("style.borderRadius", "{a:r}");
+        panel.applyPatch(patch("style.background", 0x112233));
+        assertEquals(java.util.Set.of("style.borderRadius"), panel.getBindings().keySet());
+    }
+
+    @Test
+    void aBindingSentWithThePatchSurvives() {
+        PeakLabel label = PeakLabel.create("x").bind("opacity", "{a:b}");
+        JsonObject patch = patch("opacity", 0.25f);
+        JsonObject bindings = new JsonObject();
+        bindings.addProperty("opacity", "{a:b}");
+        patch.add("bindings", bindings);
+        label.applyPatch(patch);
+        assertEquals("{a:b}", label.getBindings().get("opacity"));
+        assertFalse(label.consumeReleasedBinding("opacity"));
+    }
+
+    @Test
+    void resolvedPatchesDoNotReleaseBindings() {
+        PeakLabel label = PeakLabel.create("x").bind("opacity", "{a:b}");
+        label.applyResolvedPatch(patch("opacity", 0.5f));
+        assertEquals("{a:b}", label.getBindings().get("opacity"));
+        assertEquals(0.5f, label.getOpacity());
+    }
+
+    @Test
+    void anExplicitUnbindIsNotMarkedAsReleasedByPatch() {
+        PeakLabel label = PeakLabel.create("x").bind("opacity", "{a:b}");
+        JsonArray removed = new JsonArray();
+        removed.add("opacity");
+        JsonObject unbind = new JsonObject();
+        unbind.add("unbindings", removed);
+        label.applyPatch(unbind);
+        assertTrue(label.getBindings().isEmpty());
+        assertFalse(label.consumeReleasedBinding("opacity"));
+    }
+
+    @Test
+    void bindingAgainClearsTheReleaseMark() {
+        PeakLabel label = PeakLabel.create("x").bind("opacity", "{a:b}");
+        label.applyPatch(patch("opacity", 0.5f));
+        label.bind("opacity", "{a:b}");
+        assertFalse(label.consumeReleasedBinding("opacity"));
     }
 
     @Test

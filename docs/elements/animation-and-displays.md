@@ -149,7 +149,7 @@ PeakLeaderboardWindow<UUID> board = PeakLeaderboardWindow.<UUID>create("mygame:b
 PeakView view = audience.open(PeakDocument.create("mygame:hud").add(board.element()));
 board.bind(view);
 
-board.set(player.getUUID(), player.getName().getString(), 120);
+board.set(player.getUUID(), player.getDisplayName(), 120);
 board.add(player.getUUID(), 5);
 board.remove(player.getUUID());
 ```
@@ -161,6 +161,8 @@ board.remove(player.getUUID());
 | `ownRow(...)` | shows the viewer's own rank below the list |
 | `neighbours(n)` | adds the ranks above and below the viewer |
 | `row(...)`, `rowStyle(...)`, `columns(...)` | own row layout or look |
+
+Names are a `Component` or a `String`, so they keep colors, fonts and translations.
 
 The window is the same for everyone. Only the own-rank block differs per player. Equal scores keep the order of whoever
 reached the score first.

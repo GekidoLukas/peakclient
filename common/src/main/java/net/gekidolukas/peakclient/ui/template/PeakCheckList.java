@@ -5,6 +5,8 @@ import net.gekidolukas.peakclient.ui.PeakCheckbox;
 import net.gekidolukas.peakclient.ui.PeakId;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,7 +14,7 @@ import java.util.function.Consumer;
 public final class PeakCheckList {
     public static final String OPTION_ARG = "option";
 
-    private record Option(String value, String text, boolean checked) {}
+    private record Option(String value, Component text, boolean checked) {}
 
     private final String id;
     private final String actionId;
@@ -42,8 +44,16 @@ public final class PeakCheckList {
         return option(value, text, false);
     }
 
+    public PeakCheckList option(String value, Component text) {
+        return option(value, text, false);
+    }
+
     public PeakCheckList option(String value, String text, boolean checked) {
-        options.add(new Option(value, text, checked));
+        return option(value, Component.literal(text == null ? "" : text), checked);
+    }
+
+    public PeakCheckList option(String value, Component text, boolean checked) {
+        options.add(new Option(value, text == null ? Component.empty() : text, checked));
         return this;
     }
 

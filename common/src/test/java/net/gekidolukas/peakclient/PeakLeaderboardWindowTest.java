@@ -105,7 +105,7 @@ class PeakLeaderboardWindowTest {
         Map<String, PeakElement<?>> rows = new HashMap<>();
         for (PeakElement<?> row : list.getChildren()) {
             PeakLabel name = childLabel(row, "/name");
-            rows.put(name.getText(), row);
+            rows.put(name.getText().getString(), row);
         }
         return rows;
     }
@@ -237,8 +237,8 @@ class PeakLeaderboardWindowTest {
         Map<String, PeakElement<?>> rows = rowsByName(list(view, board));
         assertEquals(2.0, rows.get("B").getSortKey());
         assertEquals(1.0, rows.get("A").getSortKey());
-        assertEquals("#1", childLabel(rows.get("B"), "/rank").getText());
-        assertEquals("#2", childLabel(rows.get("A"), "/rank").getText());
+        assertEquals("#1", childLabel(rows.get("B"), "/rank").getText().getString());
+        assertEquals("#2", childLabel(rows.get("A"), "/rank").getText().getString());
     }
 
     @Test
@@ -309,7 +309,7 @@ class PeakLeaderboardWindowTest {
         assertEquals(1, self.getBindings().size());
         assertTrue(self.getBindings().containsKey("hidden"));
         assertTrue(self.getBindings().get("hidden").contains("test:board/self-hidden"));
-        assertEquals("{test:board/self-rank#-}", childLabel(self, "/rank").getText());
+        assertEquals("{test:board/self-rank#-}", childLabel(self, "/rank").getText().getString());
     }
 
     @Test
@@ -336,7 +336,7 @@ class PeakLeaderboardWindowTest {
         assertEquals("test:board/self/row-0", block.getChildren().get(0).getId());
         assertTrue(block.getChildren().get(0).getBindings().get("hidden").contains("test:board/self-gone-0"));
         assertTrue(block.getChildren().get(2).getBindings().isEmpty());
-        assertEquals("{test:board/self-rank-2#-}", childLabel(block.getChildren().get(2), "/rank").getText());
+        assertEquals("{test:board/self-rank-2#-}", childLabel(block.getChildren().get(2), "/rank").getText().getString());
     }
 
     @Test

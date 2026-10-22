@@ -254,7 +254,7 @@ class PeakRichTextEditorTest {
         assertEquals(300, box.getMaxLength());
         assertEquals(4, box.getMaxLines());
         assertFalse(box.isWrap());
-        assertEquals("Write...", box.getPlaceholder());
+        assertEquals("Write...", box.getPlaceholder().getString());
         assertEquals(List.of(0xFF5555, 0x55FF55), box.getColors());
         assertEquals(PeakPaint.solid(0xFF55AAFF), box.getScrollbar().getThumbColor());
         assertTrue(box.getInteraction().isEnabled());

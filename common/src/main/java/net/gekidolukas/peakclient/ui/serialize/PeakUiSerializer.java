@@ -7,6 +7,7 @@ import net.gekidolukas.peakclient.ui.PeakDocument;
 import net.gekidolukas.peakclient.ui.PeakElement;
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakUiOperation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import java.lang.reflect.Type;
@@ -24,6 +25,7 @@ public final class PeakUiSerializer {
                 .registerTypeAdapter(PeakUiOperation.class, new PeakUiOperationAdapter())
                 .registerTypeAdapter(ItemStack.class, new PeakItemStackAdapter())
                 .registerTypeHierarchyAdapter(PeakPaint.class, new PeakPaintAdapter())
+                .registerTypeHierarchyAdapter(Component.class, new PeakComponentAdapter())
                 .create();
     }
 

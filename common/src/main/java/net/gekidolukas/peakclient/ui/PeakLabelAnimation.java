@@ -1,7 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
 public final class PeakLabelAnimation {
-    private String lastTarget;
+    private PeakStyledText lastTarget;
     private boolean counting;
     private double from;
     private double to;
@@ -9,12 +9,12 @@ public final class PeakLabelAnimation {
     private double duration;
     private PeakLabelText.NumberSpan countSpan;
 
-    private String revealTarget;
+    private PeakStyledText revealTarget;
     private double revealStart;
     private int revealOffset;
     private boolean restartRequested;
 
-    public String displayText(String target, int countUpTicks, double now) {
+    public PeakStyledText displayText(PeakStyledText target, int countUpTicks, double now) {
         if (countUpTicks <= 0 || lastTarget == null) {
             lastTarget = target;
             counting = false;
@@ -45,7 +45,7 @@ public final class PeakLabelAnimation {
         return PeakLabelText.replaceNumber(target, countSpan, currentValue(now));
     }
 
-    public int revealBudget(String target, float charsPerSecond, boolean countUpActive, double now) {
+    public int revealBudget(PeakStyledText target, float charsPerSecond, boolean countUpActive, double now) {
         if (charsPerSecond <= 0f) {
             revealTarget = target;
             return -1;
@@ -62,7 +62,7 @@ public final class PeakLabelAnimation {
                 return budgetKept >= PeakLabelText.visibleLength(target) ? -1 : budgetKept;
             }
             int shown = revealed(charsPerSecond, now);
-            if (target.startsWith(revealTarget) && shown >= PeakLabelText.visibleLength(revealTarget)) {
+            if (target.plain().startsWith(revealTarget.plain()) && shown >= PeakLabelText.visibleLength(revealTarget)) {
                 revealOffset = PeakLabelText.visibleLength(revealTarget);
                 revealStart = now;
             } else {
@@ -97,7 +97,7 @@ public final class PeakLabelAnimation {
         return from + (to - from) * eased;
     }
 
-    private static boolean sameApartFromNumber(String first, String second) {
+    private static boolean sameApartFromNumber(PeakStyledText first, PeakStyledText second) {
         PeakLabelText.NumberSpan firstSpan = PeakLabelText.findNumber(first);
         PeakLabelText.NumberSpan secondSpan = PeakLabelText.findNumber(second);
         return firstSpan != null && secondSpan != null

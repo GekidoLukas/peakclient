@@ -2,6 +2,7 @@ package net.gekidolukas.peakclient.ui;
 
 import com.google.gson.JsonObject;
 import net.gekidolukas.peakclient.PeakClientTickCounter;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,8 @@ public final class PeakTimer extends PeakElement<PeakTimer> {
     private long target = 0;
     private boolean running = true;
     private PeakTimerFormat format = PeakTimerFormat.MM_SS;
-    private String prefix = "";
-    private String suffix = "";
+    private Component prefix = Component.empty();
+    private Component suffix = Component.empty();
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
     private boolean shadow = true;
 
@@ -59,10 +60,12 @@ public final class PeakTimer extends PeakElement<PeakTimer> {
     public boolean isRunning() { return running; }
     public PeakTimerFormat getFormat() { return format; }
     public PeakTimer format(PeakTimerFormat format) { this.format = format; return this; }
-    public String getPrefix() { return prefix; }
-    public PeakTimer prefix(String prefix) { this.prefix = prefix; return this; }
-    public String getSuffix() { return suffix; }
-    public PeakTimer suffix(String suffix) { this.suffix = suffix; return this; }
+    public Component getPrefix() { return prefix == null ? Component.empty() : prefix; }
+    public PeakTimer prefix(String prefix) { return prefix(Component.literal(prefix == null ? "" : prefix)); }
+    public PeakTimer prefix(Component prefix) { this.prefix = prefix == null ? Component.empty() : prefix; return this; }
+    public Component getSuffix() { return suffix == null ? Component.empty() : suffix; }
+    public PeakTimer suffix(String suffix) { return suffix(Component.literal(suffix == null ? "" : suffix)); }
+    public PeakTimer suffix(Component suffix) { this.suffix = suffix == null ? Component.empty() : suffix; return this; }
     public PeakPaint getColor() { return color; }
     public PeakTimer color(PeakPaint paint) { this.color = paint.opaque(); return this; }
     public PeakTimer color(int argb) { return color(PeakPaint.solid(argb)); }

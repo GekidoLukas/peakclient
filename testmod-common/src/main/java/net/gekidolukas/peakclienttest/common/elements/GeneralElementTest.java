@@ -4,8 +4,10 @@ import net.gekidolukas.peakclient.api.PeakClient;
 import net.gekidolukas.peakclient.helper.PeakCustomValueWatcher;
 import net.gekidolukas.peakclient.server.PeakValueKey;
 import net.gekidolukas.peakclient.ui.*;
+import net.gekidolukas.peakclient.ui.patch.PeakPatch;
 import net.gekidolukas.peakclienttest.common.PeakElementTest;
 import net.gekidolukas.peakclienttest.common.PeakElementTestStep;
+import net.gekidolukas.peakclienttest.common.PeakTestTimeline;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -126,6 +128,21 @@ public final class GeneralElementTest implements PeakElementTest {
             long start = player.level().getGameTime();
             watchTemporarily(player, "skin", () -> ((player.level().getGameTime() - start) / 40) % 2 == 0 ? STEVE : ALEX);
             watchTemporarily(player, "color", () -> ((player.level().getGameTime() - start) / 40) % 2 == 0 ? "#FF5555" : "#5555FF");
+        }));
+
+        steps.add(PeakElementTestStep.of("bindings 5: both boxes follow the value 0.4; after 2 s the left one is patched to 1.0 and leaves the binding, after 4 s the value becomes 0.15 and only the right box follows", 160, (player, docId) -> {
+            PeakClient.to(player).setValue("peaktest:opacity", "0.4");
+            PeakDocument doc = PeakDocument.create(docId);
+            PeakPanel row = row(20, 20);
+            row.add(PeakPanel.create("peaktest:general/bound-left").size(80, 50).background(0xFFFF5555).bind("opacity", "{peaktest:opacity}"));
+            row.add(PeakPanel.create("peaktest:general/bound-right").size(80, 50).background(0xFF5555FF).bind("opacity", "{peaktest:opacity}"));
+            doc.add(row);
+            PeakClient.to(player).sendUi(doc);
+            PeakTestTimeline.create(player)
+                    .at(40, () -> PeakClient.to(player).updateElement(docId, "peaktest:general/bound-left", PeakPatch.panel().opacity(1f)))
+                    .at(80, () -> PeakClient.to(player).setValue("peaktest:opacity", "0.15"))
+                    .at(120, () -> {})
+                    .start();
         }));
 
         steps.add(step("visibility: hidden with collapseWhenHidden=true (default), 'Below' moves up", 60, doc -> {

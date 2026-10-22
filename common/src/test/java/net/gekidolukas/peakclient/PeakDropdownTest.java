@@ -31,7 +31,7 @@ class PeakDropdownTest {
         PeakDropdown dropdown = countries();
 
         assertEquals(1, dropdown.selectedIndex());
-        assertEquals("France", dropdown.selectedText());
+        assertEquals("France", dropdown.selectedText().getString());
         assertEquals("fr", dropdown.inputValue());
         assertEquals(3, dropdown.nextEnabledIndex(1, 1));
         assertEquals(0, dropdown.nextEnabledIndex(1, -1));
@@ -44,7 +44,7 @@ class PeakDropdownTest {
         PeakDropdown dropdown = countries().selected("zz");
 
         assertEquals(-1, dropdown.selectedIndex());
-        assertEquals("", dropdown.selectedText());
+        assertEquals("", dropdown.selectedText().getString());
     }
 
     @Test
@@ -57,7 +57,7 @@ class PeakDropdownTest {
         assertEquals(4, read.getOptions().size());
         assertFalse(read.getOptions().get(2).isEnabled());
         assertEquals("fr", read.getSelected());
-        assertEquals("Pick one", read.getPlaceholder());
+        assertEquals("Pick one", read.getPlaceholder().getString());
         assertEquals(3, read.getMaxVisible());
         assertEquals("country", read.actionsFor(PeakEvent.CHANGE).get(0).target());
         assertNotNull(read.getInteraction());

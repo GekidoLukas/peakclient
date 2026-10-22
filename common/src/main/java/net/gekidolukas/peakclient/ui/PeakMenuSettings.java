@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -7,7 +9,7 @@ import java.util.function.Consumer;
 public final class PeakMenuSettings {
     public static final String VANILLA_PANORAMA = "minecraft:textures/gui/title/background/panorama";
 
-    private String title = "";
+    private Component title = Component.empty();
     private PeakMenuEscape escape = PeakMenuEscape.CLOSE_ALL;
     @PeakColorOrNone private PeakPaint backdrop = PeakPaint.solid(0x90000000);
     private boolean pauseGame = false;
@@ -30,8 +32,9 @@ public final class PeakMenuSettings {
 
     public static PeakMenuSettings create() { return new PeakMenuSettings(); }
 
-    public String getTitle() { return title; }
-    public PeakMenuSettings title(String title) { this.title = title == null ? "" : title; return this; }
+    public Component getTitle() { return title == null ? Component.empty() : title; }
+    public PeakMenuSettings title(String title) { this.title = Component.literal(title == null ? "" : title); return this; }
+    public PeakMenuSettings title(Component title) { this.title = title == null ? Component.empty() : title; return this; }
 
     public PeakMenuEscape getEscape() { return escape; }
     public PeakMenuSettings escape(PeakMenuEscape escape) { this.escape = escape; return this; }

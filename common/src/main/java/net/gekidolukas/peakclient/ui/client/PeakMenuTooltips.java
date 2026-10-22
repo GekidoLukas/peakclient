@@ -3,7 +3,7 @@ package net.gekidolukas.peakclient.ui.client;
 import net.gekidolukas.peakclient.render.PeakImmediateRender;
 import net.gekidolukas.peakclient.render.PeakItemElementRenderer;
 import net.gekidolukas.peakclient.render.PeakLabelRenderer;
-import net.gekidolukas.peakclient.render.PeakPlaceholderResolver;
+import net.gekidolukas.peakclient.render.PeakTextResolver;
 import net.gekidolukas.peakclient.render.PeakTooltipLabelRenderer;
 import net.gekidolukas.peakclient.render.PeakUiRenderer;
 import net.gekidolukas.peakclient.ui.PeakElement;
@@ -12,6 +12,7 @@ import net.gekidolukas.peakclient.ui.PeakItemSlot;
 import net.gekidolukas.peakclient.ui.PeakMenuSettings;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.PeakPoint;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakTheme;
 import net.gekidolukas.peakclient.ui.PeakTooltipStyle;
 import net.minecraft.client.Minecraft;
@@ -53,14 +54,14 @@ final class PeakMenuTooltips {
         ItemStack stack = PeakItemElementRenderer.resolveItemStack(minecraft, slot.getSource());
         if (stack == null || stack.isEmpty()) return;
 
-        List<String> lines = new ArrayList<>();
-        for (Component component : Screen.getTooltipFromItem(minecraft, stack)) lines.add(PeakComponentText.toLegacy(component));
+        List<PeakStyledText> lines = new ArrayList<>();
+        for (Component component : Screen.getTooltipFromItem(minecraft, stack)) lines.add(PeakStyledText.of(component));
         if (lines.isEmpty()) return;
 
         Font font = minecraft.font;
         PeakTooltipStyle style = PeakTheme.tooltip(settings, slot.getInteraction());
         int textWidth = 0;
-        for (String line : lines) textWidth = Math.max(textWidth, font.width(line));
+        for (PeakStyledText line : lines) textWidth = Math.max(textWidth, line.width(font));
         int contentHeight = lines.size() * font.lineHeight + (lines.size() > 1 ? 2 : 0);
         int inset = style.getPadding() + 1;
         PeakPoint tooltipPosition = position(mouseX, mouseY, textWidth + inset * 2, contentHeight + inset * 2, screenWidth, screenHeight);
@@ -87,12 +88,12 @@ final class PeakMenuTooltips {
             return;
         }
 
-        String text = PeakPlaceholderResolver.resolve(interaction.getTooltip());
+        PeakStyledText text = PeakTextResolver.resolved(interaction, interaction.getTooltip());
         if (text.isEmpty()) return;
         PeakTooltipStyle style = PeakTheme.tooltip(settings, interaction);
-        List<String> lines = PeakLabelRenderer.layoutLines(font, text, style.getMaxWidth());
+        List<PeakStyledText> lines = PeakLabelRenderer.layoutLines(font, text, style.getMaxWidth());
         int textWidth = 0;
-        for (String line : lines) textWidth = Math.max(textWidth, font.width(line));
+        for (PeakStyledText line : lines) textWidth = Math.max(textWidth, line.width(font));
         int contentHeight = lines.size() * font.lineHeight;
         int inset = style.getPadding() + 1;
         PeakPoint tooltipPosition = position(mouseX, mouseY, textWidth + inset * 2, contentHeight + inset * 2, screenWidth, screenHeight);

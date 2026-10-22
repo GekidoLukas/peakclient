@@ -8,6 +8,7 @@ import net.gekidolukas.peakclient.ui.PeakFormat;
 import net.gekidolukas.peakclient.ui.PeakId;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.PeakStyle;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,17 +95,18 @@ public final class PeakRichTextToolbar {
         return this;
     }
 
-    private static String label(PeakFormat format) {
-        return switch (format) {
-            case BOLD -> "§lB";
-            case ITALIC -> "§oI";
-            case UNDERLINE -> "§nU";
-            case STRIKE -> "§mS";
-            case COLOR_PREVIOUS -> "«A";
-            case COLOR_NEXT -> "A»";
-            case COLOR -> "C";
-            case CLEAR -> "Tx";
+    private static Component label(PeakFormat format) {
+        String name = switch (format) {
+            case BOLD -> "bold";
+            case ITALIC -> "italic";
+            case UNDERLINE -> "underline";
+            case STRIKE -> "strike";
+            case COLOR_PREVIOUS -> "color_previous";
+            case COLOR_NEXT -> "color_next";
+            case COLOR -> "color";
+            case CLEAR -> "clear";
         };
+        return Component.translatable("peakclient.template.toolbar." + name);
     }
 
     private static boolean togglesState(PeakFormat format) {

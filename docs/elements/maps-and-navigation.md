@@ -14,7 +14,7 @@ PeakClient.to(players).removeWaypoint(flag.getId());
 | Option | Purpose |
 | --- | --- |
 | `color(...)`, `icon(texture)`, `iconScale(f)` | look |
-| `label(...)`, `labelOnMap(boolean)` | name next to the marker |
+| `label(...)`, `labelOnMap(boolean)` | name next to the marker, a `String` or a styled and translatable `Component` |
 | `expireAfterTicks(n)` | removes the waypoint after some time (0 = never) |
 | `visibleIn(elementIds...)` | only show it in these compasses or minimaps (default: everywhere) |
 
@@ -142,8 +142,9 @@ PeakWorldAnchor.entity(uuid).occlusion(PeakOcclusion.blocksAndEntities().dimTo(0
 | `entities(...)` | which entities cover: `PLAYERS`, `LIVING`, `ALL` (line modes only) |
 | `ignoreTarget(boolean)` | the target entity and its own block never cover the anchor |
 | `depthBias(blocks)` | `PARTIAL` only: tests the label this far nearer to the camera |
+| `translucentAlpha(f)` | `PARTIAL` only: how visible the anchor stays behind glass, water and other translucent blocks (`0` hides it like a solid block, default `0.6`) |
 | `fadeTicks(n)` | time to fade when the cover changes |
 
-`PARTIAL` needs one frame to start and falls back to the line test on some setups, such as certain shader packs.
+`PARTIAL` needs one frame to start and falls back to the line test on some setups, such as certain shader packs. Where the extra depth of the world without translucent blocks cannot be read, glass and water cover the anchor like solid blocks.
 
 An anchor is always placed absolutely and does not change the layout of its parent. It is not supported in menus.

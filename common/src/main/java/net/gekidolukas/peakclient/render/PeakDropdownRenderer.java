@@ -2,6 +2,7 @@ package net.gekidolukas.peakclient.render;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakDropdown;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.client.PeakMenuInteractionState;
 import net.minecraft.client.gui.Font;
@@ -36,14 +37,14 @@ public final class PeakDropdownRenderer implements PeakElementRenderer<PeakDropd
         PeakImmediateRender.fill(graphics, 0, 0, w, h, PeakInputColors.FIELD_BACKGROUND);
         PeakPaintRenderer.drawFrame(graphics, border, w, h, thickness);
 
-        String text = PeakPlaceholderResolver.resolve(dropdown.selectedText());
+        PeakStyledText text = PeakTextResolver.resolved(dropdown, dropdown.selectedText());
         boolean placeholder = dropdown.selectedIndex() < 0;
-        if (placeholder) text = PeakPlaceholderResolver.resolve(dropdown.getPlaceholder());
+        if (placeholder) text = PeakTextResolver.resolved(dropdown, "placeholder", dropdown.getPlaceholder());
         PeakPaint color = !enabled ? PeakPaint.solid(PeakInputColors.TEXT_DISABLED)
                 : placeholder ? PeakPaint.solid(0x909090) : dropdown.getColor();
         if (!text.isEmpty()) {
             int available = Math.max(1, w - PADDING - ARROW_AREA);
-            String shown = font.width(text) > available ? font.plainSubstrByWidth(text, available) : text;
+            PeakStyledText shown = text.trimToWidth(font, available);
             PeakImmediateRender.text(graphics, font, shown, PADDING, (h - font.lineHeight) / 2 + 1, color, true);
         }
 

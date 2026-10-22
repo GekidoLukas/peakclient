@@ -41,7 +41,7 @@ class PeakDocumentModelTest {
     void modelAppliesUpdateAddAndDelete() {
         PeakDocumentModel model = new PeakDocumentModel(document("a", false, false));
         assertTrue(model.applyOperation(new PeakUiOperation.Update("first", patch("text", "b"))));
-        assertEquals("b", ((PeakLabel) model.find("first")).getText());
+        assertEquals("b", ((PeakLabel) model.find("first")).getText().getString());
 
         assertTrue(model.applyOperation(new PeakUiOperation.Add("panel", PeakLabel.create("added", "x"))));
         assertTrue(model.contains("added"));
@@ -113,9 +113,45 @@ class PeakDocumentModelTest {
         PeakDocumentModel model = new PeakDocumentModel(before);
         for (PeakUiOperation operation : PeakDocumentDiff.diff(before, after)) model.applyOperation(operation);
 
-        assertEquals("changed", ((PeakLabel) model.find("first")).getText());
+        assertEquals("changed", ((PeakLabel) model.find("first")).getText().getString());
         assertFalse(model.contains("third"));
         assertTrue(PeakDocumentDiff.diff(before, after).isEmpty());
+    }
+
+    @Test
+    void diffKeepsTheBindingOfAChangedBoundField() {
+        PeakDocument before = PeakDocument.create("doc");
+        before.add(PeakPanel.create("p").opacity(0.5f).bind("opacity", "{a:b}"));
+        PeakDocument after = PeakDocument.create("doc");
+        after.add(PeakPanel.create("p").opacity(0.8f).bind("opacity", "{a:b}"));
+
+        List<PeakUiOperation> operations = PeakDocumentDiff.diff(before, after);
+
+        assertEquals(1, operations.size());
+        PeakUiOperation.Update update = assertInstanceOf(PeakUiOperation.Update.class, operations.get(0));
+        assertEquals("{a:b}", update.patch().getAsJsonObject("bindings").get("opacity").getAsString());
+
+        PeakDocumentModel model = new PeakDocumentModel(before);
+        model.applyOperation(update);
+        PeakElement<?> panel = model.find("p");
+        assertEquals(0.8f, panel.getOpacity());
+        assertEquals("{a:b}", panel.getBindings().get("opacity"));
+    }
+
+    @Test
+    void diffReportsBindingsThatWereRemoved() {
+        PeakDocument before = PeakDocument.create("doc");
+        before.add(PeakPanel.create("p").bind("opacity", "{a:b}"));
+        PeakDocument after = PeakDocument.create("doc");
+        after.add(PeakPanel.create("p"));
+
+        List<PeakUiOperation> operations = PeakDocumentDiff.diff(before, after);
+
+        PeakUiOperation.Update update = assertInstanceOf(PeakUiOperation.Update.class, operations.get(0));
+        assertEquals("opacity", update.patch().getAsJsonArray("unbindings").get(0).getAsString());
+        PeakDocumentModel model = new PeakDocumentModel(before);
+        model.applyOperation(update);
+        assertTrue(model.find("p").getBindings().isEmpty());
     }
 
     @Test

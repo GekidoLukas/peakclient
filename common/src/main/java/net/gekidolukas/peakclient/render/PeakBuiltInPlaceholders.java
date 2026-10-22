@@ -1,5 +1,6 @@
 package net.gekidolukas.peakclient.render;
 
+import net.gekidolukas.peakclient.ui.client.PeakComponentText;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -106,7 +107,7 @@ final class PeakBuiltInPlaceholders {
 
     private static void registerIdentity() {
         register("player_name", context -> context.player().getGameProfile().getName());
-        register("player_display_name", context -> context.player().getDisplayName().getString());
+        register("player_display_name", context -> PeakComponentText.toLegacy(context.player().getDisplayName()));
         register("player_uuid", context -> context.player().getUUID().toString());
         register("world_name", context -> worldName(context.minecraft()));
         register("ping", context -> ping(context));
@@ -137,7 +138,7 @@ final class PeakBuiltInPlaceholders {
     private static void registerTargets() {
         register("target_block", context -> targetBlock(context));
         register("target_block_id", context -> targetBlockId(context));
-        register("target_entity", context -> targetEntity(context).map(entity -> entity.getDisplayName().getString()).orElse(""));
+        register("target_entity", context -> targetEntity(context).map(entity -> PeakComponentText.toLegacy(entity.getDisplayName())).orElse(""));
         register("target_entity_type", context -> targetEntity(context)
                 .map(entity -> BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString()).orElse(""));
         register("target_player_name", context -> targetEntity(context)

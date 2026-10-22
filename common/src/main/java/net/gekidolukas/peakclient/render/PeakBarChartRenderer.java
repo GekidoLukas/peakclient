@@ -2,6 +2,7 @@ package net.gekidolukas.peakclient.render;
 
 import java.util.Locale;
 import net.gekidolukas.peakclient.ui.PeakBarChart;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakChartEntry;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.PeakValueLabelPosition;
@@ -54,9 +55,10 @@ public final class PeakBarChartRenderer implements PeakElementRenderer<PeakBarCh
                         : Math.min(barY + 2, plotBottom - font.lineHeight);
                 PeakImmediateRender.text(graphics, font, valueText, labelX, labelY, chart.getValueLabelColor(), true);
             }
-            if (chart.isShowCategoryLabels() && entry.label() != null) {
-                int textWidth = font.width(entry.label());
-                PeakImmediateRender.text(graphics, font, entry.label(), x + (barWidth - textWidth) / 2, plotBottom + 2, chart.getCategoryLabelColor(), true);
+            if (chart.isShowCategoryLabels()) {
+                PeakStyledText categoryText = PeakTextResolver.resolved(entry, entry.label());
+                int textWidth = categoryText.width(font);
+                PeakImmediateRender.text(graphics, font, categoryText, x + (barWidth - textWidth) / 2, plotBottom + 2, chart.getCategoryLabelColor(), true);
             }
 
             x += barWidth + spacing;

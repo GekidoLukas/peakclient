@@ -105,7 +105,7 @@ class PeakWireFormatTest {
         PeakDocument back = (PeakDocument) viaWire(menu);
 
         assertTrue(back.isMenu());
-        assertEquals("Shop", back.getMenu().getTitle());
+        assertEquals("Shop", back.getMenu().getTitle().getString());
         assertEquals(PeakMenuEscape.BACK, back.getMenu().getEscape());
         assertEquals(PeakPaint.solid(0), back.getMenu().getBackdrop());
         PeakButton button = (PeakButton) back.findById("buy");
@@ -113,7 +113,7 @@ class PeakWireFormatTest {
         assertEquals(2, button.actionsFor(PeakEvent.CLICK).size());
         assertEquals(PeakActionType.SEND, button.actionsFor(PeakEvent.CLICK).get(0).type());
         assertEquals("sword", button.actionsFor(PeakEvent.CLICK).get(0).args().get("item"));
-        assertEquals("Buy the sword", button.getInteraction().getTooltip());
+        assertEquals("Buy the sword", button.getInteraction().getTooltip().getString());
         assertEquals(full(menu), full(back));
     }
 
@@ -129,7 +129,7 @@ class PeakWireFormatTest {
 
         assertNotNull(interaction.getTooltipElement());
         assertTrue(interaction.hasTooltip());
-        assertEquals("", interaction.getTooltip());
+        assertEquals("", interaction.getTooltip().getString());
         PeakPanel tooltip = (PeakPanel) interaction.getTooltipElement();
         assertEquals(2, tooltip.getChildren().size());
         assertEquals(PeakPaint.solid(0xFF202020), tooltip.getStyle().getBackground());
@@ -138,7 +138,7 @@ class PeakWireFormatTest {
         PeakButton button = (PeakButton) back.findById("buy");
         button.tooltip("plain");
         assertNull(button.getInteraction().getTooltipElement());
-        assertEquals("plain", button.getInteraction().getTooltip());
+        assertEquals("plain", button.getInteraction().getTooltip().getString());
     }
 
     @Test
@@ -149,11 +149,11 @@ class PeakWireFormatTest {
 
         button.applyPatch(net.gekidolukas.peakclient.ui.patch.PeakPatch.button().tooltip(card).build());
         assertNotNull(button.getInteraction().getTooltipElement());
-        assertEquals("", button.getInteraction().getTooltip());
+        assertEquals("", button.getInteraction().getTooltip().getString());
 
         button.applyPatch(net.gekidolukas.peakclient.ui.patch.PeakPatch.button().tooltip("text again").build());
         assertNull(button.getInteraction().getTooltipElement());
-        assertEquals("text again", button.getInteraction().getTooltip());
+        assertEquals("text again", button.getInteraction().getTooltip().getString());
     }
 
     @Test

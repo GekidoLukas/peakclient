@@ -12,6 +12,7 @@ import net.gekidolukas.peakclient.ui.PeakLayoutDirection;
 import net.gekidolukas.peakclient.ui.PeakPopUpContainer;
 import net.gekidolukas.peakclient.ui.PeakPopupAnimation;
 import net.gekidolukas.peakclient.ui.PeakPosition;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +35,11 @@ public final class PeakHud {
     }
 
     public static void notify(Collection<UUID> playerIds, String text, PeakPopupAnimation animation, PeakPaint color,
+                              int timeToLiveTicks) {
+        notify(playerIds, Component.literal(text), animation, color, timeToLiveTicks);
+    }
+
+    public static void notify(Collection<UUID> playerIds, Component text, PeakPopupAnimation animation, PeakPaint color,
                               int timeToLiveTicks) {
         showPopup(playerIds, List.of(PeakLabel.create(text).color(color)), animation, PeakPopupAnimation.FADE,
                 PeakPaint.rgba(0, 0, 0, 160), 6, PeakLayoutDirection.COLUMN, timeToLiveTicks);

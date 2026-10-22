@@ -9,6 +9,8 @@ import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,7 +18,7 @@ import java.util.function.Consumer;
 public final class PeakTabs {
     public static final int SELECTED_BACKGROUND = 0xFF3C78C8;
 
-    private record Tab(String title, PeakElement<?> content) {}
+    private record Tab(Component title, PeakElement<?> content) {}
 
     private final String id;
     private final List<Tab> tabs = new ArrayList<>();
@@ -38,7 +40,11 @@ public final class PeakTabs {
     }
 
     public PeakTabs tab(String title, PeakElement<?> content) {
-        tabs.add(new Tab(title, content));
+        return tab(Component.literal(title == null ? "" : title), content);
+    }
+
+    public PeakTabs tab(Component title, PeakElement<?> content) {
+        tabs.add(new Tab(title == null ? Component.empty() : title, content));
         return this;
     }
 

@@ -2,6 +2,7 @@ package net.gekidolukas.peakclient.render;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakDropdown;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakDropdownLayout;
 import net.gekidolukas.peakclient.ui.PeakOption;
 import net.minecraft.client.gui.Font;
@@ -19,7 +20,7 @@ public final class PeakDropdownOverlay {
     public static int widestText(Font font, PeakDropdown dropdown) {
         int widest = 0;
         for (PeakOption option : dropdown.getOptions()) {
-            widest = Math.max(widest, font.width(PeakPlaceholderResolver.resolve(option.getText())));
+            widest = Math.max(widest, PeakTextResolver.resolved(option, option.getText()).width(font));
         }
         return widest;
     }
@@ -45,9 +46,9 @@ public final class PeakDropdownOverlay {
             if (index == highlightIndex && option.isEnabled()) {
                 PeakImmediateRender.fill(graphics, x + 1, rowTop, textRight, rowTop + layout.rowHeight(), 0xFF2A4A7A);
             }
-            String text = PeakPlaceholderResolver.resolve(option.getText());
+            PeakStyledText text = PeakTextResolver.resolved(option, option.getText());
             int available = Math.max(1, textRight - (x + 1 + PeakDropdownLayout.TEXT_PADDING));
-            if (font.width(text) > available) text = font.plainSubstrByWidth(text, available);
+            text = text.trimToWidth(font, available);
             PeakPaint color = !option.isEnabled() ? PeakPaint.solid(PeakInputColors.TEXT_DISABLED)
                     : index == selected ? PeakPaint.solid(0x55FF55) : dropdown.getColor();
             PeakImmediateRender.text(graphics, font, text, x + 1 + PeakDropdownLayout.TEXT_PADDING,

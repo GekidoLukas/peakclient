@@ -9,6 +9,8 @@ import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,7 +18,7 @@ import java.util.function.Consumer;
 public final class PeakChoiceList {
     public static final int SELECTED_BACKGROUND = 0xFF3C78C8;
 
-    private record Option(String value, String text) {}
+    private record Option(String value, Component text) {}
 
     private final String id;
     private final String actionId;
@@ -40,7 +42,11 @@ public final class PeakChoiceList {
     }
 
     public PeakChoiceList option(String value, String text) {
-        options.add(new Option(value, text));
+        return option(value, Component.literal(text == null ? "" : text));
+    }
+
+    public PeakChoiceList option(String value, Component text) {
+        options.add(new Option(value, text == null ? Component.empty() : text));
         return this;
     }
 

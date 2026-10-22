@@ -16,6 +16,7 @@ import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.template.PeakChoiceList;
 import net.gekidolukas.peakclient.ui.template.PeakPagedList;
 import net.gekidolukas.peakclient.ui.template.PeakTabs;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -210,10 +211,10 @@ class PeakMenuTemplatesTest {
     }
 
     @Test
-    void aPagedListUsesTheNavigationHooksAndFormat() {
+    void aPagedListUsesTheNavigationHooksAndTexts() {
         PeakPanel root = PeakPagedList.create("list", 2)
                 .add(PeakLabel.create("a", "A"), PeakLabel.create("b", "B"), PeakLabel.create("c", "C"))
-                .labelFormat("%d of %d").buttonTexts("Back", "More")
+                .labelKey("my.pages").buttonTexts("Back", "More")
                 .navButton(button -> button.width(50)).build();
         PeakPanel first = (PeakPanel) root.getChildren().get(0);
         PeakPanel navigation = (PeakPanel) first.getChildren().get(first.getChildren().size() - 1);
@@ -221,7 +222,10 @@ class PeakMenuTemplatesTest {
         PeakLabel label = (PeakLabel) navigation.getChildren().get(1);
 
         assertEquals(50, previous.getSize().getWidth().value());
-        assertEquals("1 of 2", label.getText());
+        TranslatableContents contents = assertInstanceOf(TranslatableContents.class, label.getText().getContents());
+        assertEquals("my.pages", contents.getKey());
+        assertArrayEquals(new Object[]{1, 2}, contents.getArgs());
+        assertEquals("Back", ((PeakLabel) previous.getChildren().get(0)).getText().getString());
     }
 
     @Test

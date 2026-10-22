@@ -15,6 +15,8 @@ import net.gekidolukas.peakclienttest.common.PeakMenuTestStep;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -69,7 +71,9 @@ public final class ItemsMenuTest implements PeakMenuTest {
                 slot("items:apples", apples),
                 slot("items:pickaxe", pickaxe).showDurability(false),
                 slot("items:special", special),
-                slot("items:price", priced).countText("§e5g"));
+                slot("items:price", priced).countText("§e5g"),
+                slot("items:styled", new ItemStack(Items.GOLD_INGOT)).countText(Component.literal("x2").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD)),
+                slot("items:font", new ItemStack(Items.BOOK)).countText(Component.literal("ab").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:alt")))));
 
         PeakPanel second = PeakPanel.create("items:row2").row().gap(4).padding(0).background(0);
         second.add(slot("items:custom", new ItemStack(Items.NETHER_STAR)).tooltip("Custom tooltip text"),

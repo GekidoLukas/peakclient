@@ -5,6 +5,7 @@ import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.PeakRichTextBox;
 import net.gekidolukas.peakclient.ui.PeakScrollbarStyle;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakStyle;
 import net.gekidolukas.peakclient.ui.client.PeakMenuInteractionState;
 import net.gekidolukas.peakclient.ui.client.PeakRichText;
@@ -116,8 +117,9 @@ public final class PeakRichTextBoxRenderer implements PeakElementRenderer<PeakRi
         graphics.enableScissor(scissorLeft, scissorTop, scissorRight, scissorBottom);
         try {
             if (text.length() == 0 && !focused) {
-                if (!box.getPlaceholder().isEmpty()) {
-                    PeakImmediateRender.text(graphics, font, box.getPlaceholder(), PADDING_X, PADDING_Y, 0x707070, false);
+                PeakStyledText placeholderText = PeakTextResolver.resolved(box, box.getPlaceholder());
+                if (!placeholderText.isEmpty()) {
+                    PeakImmediateRender.text(graphics, font, placeholderText, PADDING_X, PADDING_Y, 0x707070, false);
                 }
             } else {
                 drawLines(graphics, font, box, editor, layout, measure, focused, textPaint, offset, scrollX, innerHeight, lineHeight);

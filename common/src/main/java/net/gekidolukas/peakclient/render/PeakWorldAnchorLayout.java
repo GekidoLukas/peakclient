@@ -168,7 +168,8 @@ public final class PeakWorldAnchorLayout {
         } finally {
             if (!finished) PeakOffscreenOpacity.end(minecraft, graphics, 1f);
         }
-        PeakDepthComposite.present(minecraft, graphics, placement.ndcZ(), Math.min(1f, placement.alpha()), hiddenAlpha);
+        PeakDepthComposite.present(minecraft, graphics, placement.ndcZ(), Math.min(1f, placement.alpha()), hiddenAlpha,
+                occlusion.getTranslucentAlpha());
     }
 
     private static float biasedDepth(PeakWorldAnchor anchor, PeakCameraProjection.Projection projection, Vec3 camera, Vec3 point,

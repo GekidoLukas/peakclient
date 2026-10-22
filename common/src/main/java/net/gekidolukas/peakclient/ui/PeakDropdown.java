@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.List;
 public final class PeakDropdown extends PeakElement<PeakDropdown> implements PeakInput {
     private List<PeakOption> options = new ArrayList<>();
     private String selected = "";
-    private String placeholder = "";
+    private Component placeholder = Component.empty();
     private int maxVisible = 6;
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
 
@@ -25,6 +27,8 @@ public final class PeakDropdown extends PeakElement<PeakDropdown> implements Pea
     public List<PeakOption> getOptions() { return options == null ? List.of() : options; }
     public PeakDropdown option(String value, String text) { return option(PeakOption.of(value, text)); }
     public PeakDropdown option(String value, String text, boolean enabled) { return option(PeakOption.of(value, text, enabled)); }
+    public PeakDropdown option(String value, Component text) { return option(PeakOption.of(value, text)); }
+    public PeakDropdown option(String value, Component text, boolean enabled) { return option(PeakOption.of(value, text, enabled)); }
     public PeakDropdown option(PeakOption option) {
         if (options == null) options = new ArrayList<>();
         options.add(option);
@@ -46,8 +50,9 @@ public final class PeakDropdown extends PeakElement<PeakDropdown> implements Pea
         return -1;
     }
 
-    public String getPlaceholder() { return placeholder == null ? "" : placeholder; }
-    public PeakDropdown placeholder(String placeholder) { this.placeholder = placeholder == null ? "" : placeholder; return this; }
+    public Component getPlaceholder() { return placeholder == null ? Component.empty() : placeholder; }
+    public PeakDropdown placeholder(String placeholder) { return placeholder(Component.literal(placeholder == null ? "" : placeholder)); }
+    public PeakDropdown placeholder(Component placeholder) { this.placeholder = placeholder == null ? Component.empty() : placeholder; return this; }
 
     public int getMaxVisible() { return Math.max(1, Math.min(maxVisible, 32)); }
     public PeakDropdown maxVisible(int rows) { this.maxVisible = Math.max(1, Math.min(rows, 32)); return this; }
@@ -56,9 +61,9 @@ public final class PeakDropdown extends PeakElement<PeakDropdown> implements Pea
     public PeakDropdown color(PeakPaint paint) { this.color = paint.opaque(); return this; }
     public PeakDropdown color(int argb) { return color(PeakPaint.solid(argb)); }
 
-    public String selectedText() {
+    public Component selectedText() {
         int index = selectedIndex();
-        return index < 0 ? "" : getOptions().get(index).getText();
+        return index < 0 ? Component.empty() : getOptions().get(index).getText();
     }
 
     public int nextEnabledIndex(int from, int step) {

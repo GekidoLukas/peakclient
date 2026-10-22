@@ -67,10 +67,10 @@ class PeakViewThreadTest {
 
         view.update(label, PeakPatch.label().text("after"));
 
-        assertEquals("before", label.getText());
+        assertEquals("before", label.getText().getString());
         assertFalse(queue.isEmpty());
         drain();
-        assertEquals("after", label.getText());
+        assertEquals("after", label.getText().getString());
 
         view.flush();
         drain();
@@ -86,7 +86,7 @@ class PeakViewThreadTest {
         view.update("l", PeakPatch.label().text("second"));
         drain();
 
-        assertEquals("second", label.getText());
+        assertEquals("second", label.getText().getString());
     }
 
     @Test
@@ -97,7 +97,7 @@ class PeakViewThreadTest {
         onServerThread = true;
         view.update(label, PeakPatch.label().text("now"));
 
-        assertEquals("now", label.getText());
+        assertEquals("now", label.getText().getString());
         assertTrue(queue.isEmpty());
     }
 
@@ -111,7 +111,7 @@ class PeakViewThreadTest {
         patch.text("changed afterwards");
         drain();
 
-        assertEquals("queued", label.getText());
+        assertEquals("queued", label.getText().getString());
     }
 
     @Test
@@ -122,7 +122,7 @@ class PeakViewThreadTest {
         view.update(PeakRef.label("l"), patch -> patch.text("typed"));
         drain();
 
-        assertEquals("typed", label.getText());
+        assertEquals("typed", label.getText().getString());
     }
 
     @Test
@@ -134,7 +134,7 @@ class PeakViewThreadTest {
         view.flush();
         drain();
 
-        assertEquals("before", label.getText());
+        assertEquals("before", label.getText().getString());
         assertTrue(api.calls.stream().noneMatch(call -> call.name().equals("update:threaded")));
     }
 

@@ -6,6 +6,7 @@ import net.gekidolukas.peakclient.ui.PeakElement;
 import net.gekidolukas.peakclient.ui.PeakId;
 import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
 
 public final class PeakCollapsible {
     private final String id;
-    private final String title;
+    private final Component title;
     private final List<PeakElement<?>> content = new ArrayList<>();
     private boolean open;
     private int width = -1;
@@ -22,12 +23,16 @@ public final class PeakCollapsible {
     private int indent = 10;
     private Consumer<PeakButton> headerStyle;
 
-    private PeakCollapsible(String id, String title) {
+    private PeakCollapsible(String id, Component title) {
         this.id = PeakId.require(id, "Collapsible");
-        this.title = title == null ? "" : title;
+        this.title = title == null ? Component.empty() : title;
     }
 
     public static PeakCollapsible create(String id, String title) {
+        return new PeakCollapsible(id, Component.literal(title == null ? "" : title));
+    }
+
+    public static PeakCollapsible create(String id, Component title) {
         return new PeakCollapsible(id, title);
     }
 

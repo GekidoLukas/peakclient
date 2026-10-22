@@ -3,6 +3,7 @@ package net.gekidolukas.peakclient.ui;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.gekidolukas.peakclient.PeakLog;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -36,6 +37,7 @@ public abstract class PeakElement<SELF extends PeakElement<SELF>> {
     protected Map<String, String> bindings = new LinkedHashMap<>();
     protected PeakInteraction interaction;
     protected List<PeakReaction> events = new ArrayList<>();
+    private transient Set<String> releasedBindings;
 
     protected PeakElement(String id) {
         this.id = id == null ? null : PeakId.require(id, "Element");
@@ -106,6 +108,7 @@ public abstract class PeakElement<SELF extends PeakElement<SELF>> {
     public SELF bind(String field, String expression) {
         if (bindings == null) bindings = new LinkedHashMap<>();
         bindings.put(field, expression);
+        if (releasedBindings != null) releasedBindings.remove(field);
         return self();
     }
     public SELF unbind(String field) {
@@ -177,6 +180,7 @@ public abstract class PeakElement<SELF extends PeakElement<SELF>> {
     }
 
     public SELF tooltip(String tooltip) { ensureInteraction().tooltip(tooltip); return self(); }
+    public SELF tooltip(Component tooltip) { ensureInteraction().tooltip(tooltip); return self(); }
     public SELF tooltip(PeakElement<?> element) { ensureInteraction().tooltip(element); return self(); }
     public SELF enabled(boolean enabled) { ensureInteraction().enabled(enabled); return self(); }
     public SELF hoverStyle(PeakStyle style) { ensureInteraction().hoverStyle(style); return self(); }
@@ -212,6 +216,39 @@ public abstract class PeakElement<SELF extends PeakElement<SELF>> {
     public abstract String elementType();
 
     public final void applyPatch(JsonObject patch) {
+        applyPatch(patch, true);
+    }
+
+    public final void applyResolvedPatch(JsonObject patch) {
+        applyPatch(patch, false);
+    }
+
+    public final boolean consumeReleasedBinding(String path) {
+        return releasedBindings != null && releasedBindings.remove(path);
+    }
+
+    static boolean bindingCovers(String patchKey, String bindingPath) {
+        return bindingPath.equals(patchKey)
+                || bindingPath.startsWith(patchKey + ".")
+                || patchKey.startsWith(bindingPath + ".");
+    }
+
+    private void releaseBoundFields(JsonObject patch) {
+        if (bindings == null || bindings.isEmpty()) return;
+        JsonObject rebound = patch.get("bindings") instanceof JsonObject object ? object : null;
+        for (String key : patch.keySet()) {
+            if (BASE_CUSTOM_PATCH_KEYS.contains(key)) continue;
+            for (String path : new ArrayList<>(bindings.keySet())) {
+                if (!bindingCovers(key, path)) continue;
+                if (rebound != null && rebound.has(path)) continue;
+                bindings.remove(path);
+                if (releasedBindings == null) releasedBindings = new LinkedHashSet<>();
+                releasedBindings.add(path);
+            }
+        }
+    }
+
+    private void applyPatch(JsonObject patch, boolean releaseBindings) {
         beforePatch(patch);
         PeakFieldTable table = PeakFieldTable.of(getClass());
         Set<String> customKeys = customPatchKeys();
@@ -229,6 +266,7 @@ public abstract class PeakElement<SELF extends PeakElement<SELF>> {
                 PeakLog.warn("Could not apply patch key '{}' on {} '{}': {}", key, getClass().getSimpleName(), id, e.toString());
             }
         }
+        if (releaseBindings) releaseBoundFields(patch);
         syncInteraction();
         afterPatch(patch);
     }
@@ -240,7 +278,10 @@ public abstract class PeakElement<SELF extends PeakElement<SELF>> {
     protected void applyCustomPatch(String key, JsonElement value) {
         if (key.equals("bindings")) {
             if (bindings == null) bindings = new LinkedHashMap<>();
-            value.getAsJsonObject().entrySet().forEach(e -> bindings.put(e.getKey(), e.getValue().getAsString()));
+            value.getAsJsonObject().entrySet().forEach(e -> {
+                bindings.put(e.getKey(), e.getValue().getAsString());
+                if (releasedBindings != null) releasedBindings.remove(e.getKey());
+            });
         } else if (key.equals("unbindings") && bindings != null) {
             value.getAsJsonArray().forEach(e -> bindings.remove(e.getAsString()));
         }

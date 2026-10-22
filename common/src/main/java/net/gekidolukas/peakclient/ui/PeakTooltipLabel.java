@@ -1,15 +1,9 @@
 package net.gekidolukas.peakclient.ui;
 
-import com.google.gson.JsonObject;
-import net.gekidolukas.peakclient.ui.serialize.PeakUiSerializer;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraft.network.chat.Component;
 
 public final class PeakTooltipLabel extends PeakElement<PeakTooltipLabel> {
-    private String text;
-    private String translationKey;
-    private List<String> translationArgs = new ArrayList<>();
+    private Component text;
     private int tooltipPaddingHorizontal = 0;
     private int tooltipPaddingVertical = 0;
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
@@ -23,28 +17,25 @@ public final class PeakTooltipLabel extends PeakElement<PeakTooltipLabel> {
 
     public PeakTooltipLabel(String text) { this(PeakId.random(), text); }
 
-    public PeakTooltipLabel(String id, String text) {
+    public PeakTooltipLabel(String id, String text) { this(id, Component.literal(text == null ? "" : text)); }
+
+    public PeakTooltipLabel(String id, Component text) {
         super(id);
-        this.text = text;
+        this.text = text == null ? Component.empty() : text;
     }
 
     public static PeakTooltipLabel create(String text) { return new PeakTooltipLabel(text); }
     public static PeakTooltipLabel create(String id, String text) { return new PeakTooltipLabel(id, text); }
+    public static PeakTooltipLabel create(Component text) { return new PeakTooltipLabel(PeakId.random(), text); }
+    public static PeakTooltipLabel create(String id, Component text) { return new PeakTooltipLabel(id, text); }
 
-    public static PeakTooltipLabel translatable(String key, String... args) {
-        PeakTooltipLabel label = new PeakTooltipLabel(PeakId.random(), "");
-        return label.translationKey(key, args);
+    public static PeakTooltipLabel translatable(String key, Object... args) {
+        return new PeakTooltipLabel(PeakId.random(), Component.translatable(key, args));
     }
 
-    public String getText() { return text; }
-    public PeakTooltipLabel text(String text) { this.text = text; this.translationKey = null; return this; }
-    public String getTranslationKey() { return translationKey; }
-    public List<String> getTranslationArgs() { return translationArgs; }
-    public PeakTooltipLabel translationKey(String key, String... args) {
-        this.translationKey = key;
-        this.translationArgs = List.of(args);
-        return this;
-    }
+    public Component getText() { return text; }
+    public PeakTooltipLabel text(String text) { this.text = Component.literal(text == null ? "" : text); return this; }
+    public PeakTooltipLabel text(Component text) { this.text = text == null ? Component.empty() : text; return this; }
 
     public int getTooltipPaddingHorizontal() { return tooltipPaddingHorizontal; }
     public int getTooltipPaddingVertical() { return tooltipPaddingVertical; }
@@ -84,10 +75,4 @@ public final class PeakTooltipLabel extends PeakElement<PeakTooltipLabel> {
 
     @Override
     public String elementType() { return "tooltip_label"; }
-
-    @Override
-    protected void afterPatch(JsonObject patch) {
-        if (patch.has("text") && !patch.has("translationKey")) this.translationKey = null;
-        if (patch.has("translationKey") && !patch.has("translationArgs")) this.translationArgs = new ArrayList<>();
-    }
 }

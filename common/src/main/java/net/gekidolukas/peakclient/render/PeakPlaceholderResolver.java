@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.render;
 
+import net.gekidolukas.peakclient.ui.PeakStyledText;
+import net.gekidolukas.peakclient.ui.serialize.PeakComponentValue;
 import net.gekidolukas.peakclient.ui.client.PeakClientCustomValues;
 
 import java.util.Locale;
@@ -21,10 +23,33 @@ public final class PeakPlaceholderResolver {
             String key = matcher.group(2);
             String rawArg = matcher.group(3);
             String rawDefault = matcher.group(4);
-            matcher.appendReplacement(out, Matcher.quoteReplacement(resolvePlaceholder(namespace, key, rawArg, rawDefault)));
+            matcher.appendReplacement(out, Matcher.quoteReplacement(PeakComponentValue.plain(resolvePlaceholder(namespace, key, rawArg, rawDefault))));
         }
         matcher.appendTail(out);
         return out.toString();
+    }
+
+    public static PeakStyledText resolve(PeakStyledText input) {
+        String plain = input.plain();
+        if (plain.indexOf('{') < 0) return input;
+        Matcher matcher = PATTERN.matcher(plain);
+        PeakStyledText.Builder out = null;
+        int last = 0;
+        while (matcher.find()) {
+            if (out == null) out = PeakStyledText.builder();
+            out.append(input.slice(last, matcher.start()));
+            String namespace = matcher.group(1).toLowerCase(Locale.ROOT);
+            String replacement = resolvePlaceholder(namespace, matcher.group(2), matcher.group(3), matcher.group(4));
+            if (PeakComponentValue.isEncoded(replacement)) {
+                out.append(PeakStyledText.of(PeakComponentValue.decode(replacement), input.styleAt(matcher.start())));
+            } else {
+                out.appendLegacy(replacement, input.styleAt(matcher.start()));
+            }
+            last = matcher.end();
+        }
+        if (out == null) return input;
+        out.append(input.slice(last, plain.length()));
+        return out.build();
     }
 
     public record Result(String value, boolean complete) {}
@@ -53,7 +78,7 @@ public final class PeakPlaceholderResolver {
             } else {
                 replacement = resolved.value();
             }
-            matcher.appendReplacement(out, Matcher.quoteReplacement(replacement));
+            matcher.appendReplacement(out, Matcher.quoteReplacement(PeakComponentValue.plain(replacement)));
         }
         matcher.appendTail(out);
         return new Result(out.toString(), complete);

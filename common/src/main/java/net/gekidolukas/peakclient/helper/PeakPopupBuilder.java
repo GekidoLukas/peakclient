@@ -6,6 +6,7 @@ import net.gekidolukas.peakclient.ui.PeakElement;
 import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakLayoutDirection;
 import net.gekidolukas.peakclient.ui.PeakPopupAnimation;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,9 @@ public final class PeakPopupBuilder {
     public PeakPopupBuilder addLabel(String text) { children.add(PeakLabel.create(text)); return this; }
     public PeakPopupBuilder addLabel(String text, PeakPaint color) { children.add(PeakLabel.create(text).color(color)); return this; }
     public PeakPopupBuilder addLabel(String text, int color) { return addLabel(text, PeakPaint.solid(color)); }
+    public PeakPopupBuilder addLabel(Component text) { children.add(PeakLabel.create(text)); return this; }
+    public PeakPopupBuilder addLabel(Component text, PeakPaint color) { children.add(PeakLabel.create(text).color(color)); return this; }
+    public PeakPopupBuilder addLabel(Component text, int color) { return addLabel(text, PeakPaint.solid(color)); }
 
     public void show() {
         PeakHud.showPopup(targets.ids(), children, enterAnimation, exitAnimation, backgroundColor, padding, direction, timeToLiveTicks);

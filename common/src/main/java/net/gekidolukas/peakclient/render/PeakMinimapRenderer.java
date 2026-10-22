@@ -12,6 +12,7 @@ import net.gekidolukas.peakclient.ui.PeakMinimap;
 import net.gekidolukas.peakclient.ui.PeakMinimapPlayerIconMode;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.PeakPoint;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakWaypoint;
 import net.gekidolukas.peakclient.ui.PeakWorldBorderSource;
 import net.gekidolukas.peakclient.ui.client.PeakClientCustomWorldBorderState;
@@ -228,15 +229,16 @@ public final class PeakMinimapRenderer implements PeakElementRenderer<PeakMinima
             PeakPaintRenderer.fill(graphics, waypoint.getColor(), x - size / 2, y - size / 2, x + size / 2, y + size / 2);
         }
 
-        if (showLabel && waypoint.getLabel() != null && !waypoint.getLabel().isEmpty()) {
-            int labelWidth = Math.round(font.width(waypoint.getLabel()) * labelScale);
+        PeakStyledText waypointText = waypoint.getLabel() == null ? PeakStyledText.EMPTY : PeakTextResolver.resolved(waypoint, waypoint.getLabel());
+        if (showLabel && !waypointText.isEmpty()) {
+            int labelWidth = Math.round(waypointText.width(font) * labelScale);
             int textX = x - labelWidth / 2;
             int textY = y + size / 2 + 1;
 
             graphics.pose().pushPose();
             graphics.pose().translate(textX, textY, 0);
             graphics.pose().scale(labelScale, labelScale, 1f);
-            PeakImmediateRender.text(graphics, font, waypoint.getLabel(), 0, 0, waypoint.getColor(), true);
+            PeakImmediateRender.text(graphics, font, waypointText, 0, 0, waypoint.getColor(), true);
             graphics.pose().popPose();
         }
     }

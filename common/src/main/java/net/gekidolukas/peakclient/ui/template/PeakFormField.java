@@ -7,28 +7,34 @@ import net.gekidolukas.peakclient.ui.PeakLabel;
 import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.PeakUiOperation;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
 public final class PeakFormField {
-    public static final String REQUIRED_MESSAGE = "This field is required";
+    public static final String REQUIRED_KEY = "peakclient.template.form.required";
 
     private final String id;
-    private final String label;
+    private final Component label;
     private PeakElement<?> input;
     private boolean required;
-    private String hint = "";
+    private Component hint = Component.empty();
     private int gap = 3;
     private int width = -1;
     private PeakPaint labelColor = PeakPaint.solid(0xAAAAAA);
-    private String requiredMessage = REQUIRED_MESSAGE;
+    private Component requiredMessage = Component.translatable(REQUIRED_KEY);
 
-    private PeakFormField(String id, String label) {
+    private PeakFormField(String id, Component label) {
         this.id = PeakId.require(id, "Form field");
-        this.label = label == null ? "" : label;
+        this.label = label == null ? Component.empty() : label;
     }
 
     public static PeakFormField create(String id, String label) {
+        return new PeakFormField(id, Component.literal(label == null ? "" : label));
+    }
+
+    public static PeakFormField create(String id, Component label) {
         return new PeakFormField(id, label);
     }
 
@@ -47,7 +53,11 @@ public final class PeakFormField {
     }
 
     public PeakFormField hint(String hint) {
-        this.hint = hint == null ? "" : hint;
+        return hint(Component.literal(hint == null ? "" : hint));
+    }
+
+    public PeakFormField hint(Component hint) {
+        this.hint = hint == null ? Component.empty() : hint;
         return this;
     }
 
@@ -71,7 +81,11 @@ public final class PeakFormField {
     }
 
     public PeakFormField requiredMessage(String message) {
-        this.requiredMessage = message == null || message.isEmpty() ? REQUIRED_MESSAGE : message;
+        return requiredMessage(message == null || message.isEmpty() ? null : Component.literal(message));
+    }
+
+    public PeakFormField requiredMessage(Component message) {
+        this.requiredMessage = message == null ? Component.translatable(REQUIRED_KEY) : message;
         return this;
     }
 
@@ -80,14 +94,16 @@ public final class PeakFormField {
         PeakPanel root = PeakPanel.create(id).column().gap(gap).padding(0).background(0);
         if (width > 0) root.width(width);
 
-        String shownLabel = required ? label + " §c*" : label;
+        Component shownLabel = required
+                ? label.copy().append(Component.literal(" *").withStyle(ChatFormatting.RED))
+                : label;
         root.add(PeakLabel.create(labelId(id), shownLabel).color(labelColor));
 
         input.required(required);
         input.errorElement(errorId(id));
         root.add(input);
 
-        if (!hint.isEmpty()) root.add(PeakLabel.create(hintId(id), hint).color(0x777777));
+        if (!hint.getString().isEmpty()) root.add(PeakLabel.create(hintId(id), hint).color(0x777777));
         PeakLabel error = PeakLabel.create(errorId(id), requiredMessage).color(0xFF5555);
         error.hidden(true);
         root.add(error);
@@ -95,7 +111,11 @@ public final class PeakFormField {
     }
 
     public static List<PeakUiOperation> errorOperations(String fieldId, String inputId, String message) {
-        boolean failed = message != null && !message.isEmpty();
+        return errorOperations(fieldId, inputId, message == null || message.isEmpty() ? null : Component.literal(message));
+    }
+
+    public static List<PeakUiOperation> errorOperations(String fieldId, String inputId, Component message) {
+        boolean failed = message != null && !message.getString().isEmpty();
         PeakUiOperation input = new PeakUiOperation.Update(inputId,
                 PeakPatch.textBox().field("interaction.invalid", failed).build());
         var label = PeakPatch.label();

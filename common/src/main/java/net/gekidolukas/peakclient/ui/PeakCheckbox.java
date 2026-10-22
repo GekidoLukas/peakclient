@@ -1,8 +1,10 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 public final class PeakCheckbox extends PeakElement<PeakCheckbox> implements PeakInput {
     private boolean checked = false;
-    private String text = "";
+    private Component text = Component.empty();
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
     private PeakCheckboxLook look = PeakCheckboxLook.BOX;
 
@@ -16,6 +18,7 @@ public final class PeakCheckbox extends PeakElement<PeakCheckbox> implements Pea
     public static PeakCheckbox create() { return new PeakCheckbox(); }
     public static PeakCheckbox create(String id) { return new PeakCheckbox(id); }
     public static PeakCheckbox create(String id, String text) { return new PeakCheckbox(id).text(text); }
+    public static PeakCheckbox create(String id, Component text) { return new PeakCheckbox(id).text(text); }
 
     public boolean isChecked() { return checked; }
     public PeakCheckbox checked(boolean checked) { this.checked = checked; return this; }
@@ -24,8 +27,9 @@ public final class PeakCheckbox extends PeakElement<PeakCheckbox> implements Pea
     public PeakCheckbox look(PeakCheckboxLook look) { this.look = look; return this; }
     public PeakCheckbox asSwitch() { return look(PeakCheckboxLook.SWITCH); }
 
-    public String getText() { return text == null ? "" : text; }
-    public PeakCheckbox text(String text) { this.text = text == null ? "" : text; return this; }
+    public Component getText() { return text == null ? Component.empty() : text; }
+    public PeakCheckbox text(String text) { this.text = Component.literal(text == null ? "" : text); return this; }
+    public PeakCheckbox text(Component text) { this.text = text == null ? Component.empty() : text; return this; }
 
     public PeakPaint getColor() { return color; }
     public PeakCheckbox color(PeakPaint paint) { this.color = paint.opaque(); return this; }

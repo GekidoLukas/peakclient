@@ -14,5 +14,22 @@
   "peakclient.direction.northwest": "NW",
   "peakclient.weather.clear": "Clear",
   "peakclient.weather.rain": "Rain",
-  "peakclient.weather.thunder": "Thunder"
+  "peakclient.weather.thunder": "Thunder",
+  "peakclient.menu.title": "PeakClient Menu",
+  "peakclient.template.paged.previous": "<",
+  "peakclient.template.paged.next": ">",
+  "peakclient.template.paged.label": "Page %s / %s",
+  "peakclient.template.paged.loading": "Loading...",
+  "peakclient.template.confirm.title": "Confirm",
+  "peakclient.template.confirm.confirm": "Confirm",
+  "peakclient.template.confirm.cancel": "Cancel",
+  "peakclient.template.form.required": "This field is required",
+  "peakclient.template.toolbar.bold": "§lB",
+  "peakclient.template.toolbar.italic": "§oI",
+  "peakclient.template.toolbar.underline": "§nU",
+  "peakclient.template.toolbar.strike": "§mS",
+  "peakclient.template.toolbar.color_previous": "«A",
+  "peakclient.template.toolbar.color_next": "A»",
+  "peakclient.template.toolbar.color": "C",
+  "peakclient.template.toolbar.clear": "Tx"
 }

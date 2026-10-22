@@ -6,6 +6,7 @@ import net.gekidolukas.peakclient.ui.PeakElement;
 import net.gekidolukas.peakclient.ui.PeakUiOperation;
 import net.gekidolukas.peakclient.ui.patch.PeakBasePatch;
 import net.gekidolukas.peakclient.ui.template.PeakFormField;
+import net.minecraft.network.chat.Component;
 
 import java.util.Collection;
 import java.util.List;
@@ -64,6 +65,10 @@ public final class PeakMenus {
     }
 
     public PeakMenus formError(String menuId, String fieldId, String inputId, String message) {
+        return update(menuId, PeakFormField.errorOperations(fieldId, inputId, message));
+    }
+
+    public PeakMenus formError(String menuId, String fieldId, String inputId, Component message) {
         return update(menuId, PeakFormField.errorOperations(fieldId, inputId, message));
     }
 

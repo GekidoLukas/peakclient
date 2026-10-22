@@ -5,6 +5,7 @@ import net.gekidolukas.peakclient.ui.PeakLayoutDirection;
 import net.gekidolukas.peakclient.ui.PeakOption;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.gekidolukas.peakclient.ui.PeakRadioGroup;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakRadioLayout;
 import net.gekidolukas.peakclient.ui.PeakRect;
 import net.gekidolukas.peakclient.ui.client.PeakMenuInteractionState;
@@ -18,7 +19,7 @@ public final class PeakRadioGroupRenderer implements PeakElementRenderer<PeakRad
         List<PeakOption> options = group.getOptions();
         int[] widths = new int[options.size()];
         for (int i = 0; i < widths.length; i++) {
-            widths[i] = font.width(PeakPlaceholderResolver.resolve(options.get(i).getText()));
+            widths[i] = PeakTextResolver.resolved(options.get(i), options.get(i).getText()).width(font);
         }
         return PeakRadioLayout.of(widths, font.lineHeight, group.getDirection() == PeakLayoutDirection.ROW, group.getGap());
     }
@@ -60,7 +61,7 @@ public final class PeakRadioGroupRenderer implements PeakElementRenderer<PeakRad
                 disc(graphics, cell.x() + 3, circleY + 3, PeakRadioLayout.CIRCLE - 6, PeakPaint.solid(optionEnabled ? 0xFF55FF55 : 0xFF557755));
             }
 
-            String text = PeakPlaceholderResolver.resolve(option.getText());
+            PeakStyledText text = PeakTextResolver.resolved(option, option.getText());
             if (!text.isEmpty()) {
                 int textY = cell.y() + Math.max(0, (layout.rowHeight() - font.lineHeight) / 2) + 1;
                 PeakImmediateRender.text(graphics, font, text, cell.x() + PeakRadioLayout.CIRCLE + PeakRadioLayout.TEXT_GAP,

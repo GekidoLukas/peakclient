@@ -1,5 +1,6 @@
 package net.gekidolukas.peakclient.ui;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.gekidolukas.peakclient.ui.serialize.PeakUiSerializer;
@@ -77,7 +78,33 @@ public final class PeakDocumentDiff {
             if (!next.isPatchKeyKnown(key)) continue;
             if (!entry.getValue().equals(before.get(key))) patch.add(key, entry.getValue());
         }
+        keepBindingsOfPatchedFields(next, patch);
+        dropRemovedBindings(previous, next, patch);
         return patch;
+    }
+
+    private static void keepBindingsOfPatchedFields(PeakElement<?> next, JsonObject patch) {
+        Map<String, String> bound = next.getBindings();
+        if (bound.isEmpty()) return;
+        JsonObject kept = patch.get("bindings") instanceof JsonObject existing ? existing : new JsonObject();
+        boolean added = false;
+        for (String key : new ArrayList<>(patch.keySet())) {
+            if (key.equals("bindings") || key.equals("unbindings")) continue;
+            for (Map.Entry<String, String> binding : bound.entrySet()) {
+                if (!PeakElement.bindingCovers(key, binding.getKey()) || kept.has(binding.getKey())) continue;
+                kept.addProperty(binding.getKey(), binding.getValue());
+                added = true;
+            }
+        }
+        if (added && !patch.has("bindings")) patch.add("bindings", kept);
+    }
+
+    private static void dropRemovedBindings(PeakElement<?> previous, PeakElement<?> next, JsonObject patch) {
+        JsonArray dropped = new JsonArray();
+        for (String path : previous.getBindings().keySet()) {
+            if (!next.getBindings().containsKey(path)) dropped.add(path);
+        }
+        if (!dropped.isEmpty()) patch.add("unbindings", dropped);
     }
 
     private static void collect(PeakElement<?> element, String parentId,

@@ -58,6 +58,7 @@ public final class PeakBindingResolver {
         Map<String, String> bindings = element.getBindings();
         states.entrySet().removeIf(entry -> {
             if (bindings.containsKey(entry.getKey())) return false;
+            if (element.consumeReleasedBinding(entry.getKey())) return true;
             FieldState state = entry.getValue();
             if (state.base != null && state.lastApplied != null && !state.unusable) {
                 try {
@@ -170,7 +171,7 @@ public final class PeakBindingResolver {
             cursor.add(segments[segments.length - 1], value);
             patch.add(segments[0], topObject);
         }
-        element.applyPatch(patch);
+        element.applyResolvedPatch(patch);
     }
 
     private static boolean sameRgb(JsonElement actual, JsonPrimitive expected) {

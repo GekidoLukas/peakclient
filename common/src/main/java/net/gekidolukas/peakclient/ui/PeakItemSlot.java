@@ -1,5 +1,6 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 
@@ -7,7 +8,7 @@ public final class PeakItemSlot extends PeakElement<PeakItemSlot> {
     private PeakItemSource source;
     private boolean showCount = true;
     private boolean showDurability = true;
-    private String countText = "";
+    private Component countText = Component.empty();
     private boolean selected = false;
     private boolean itemTooltip = true;
 
@@ -36,8 +37,9 @@ public final class PeakItemSlot extends PeakElement<PeakItemSlot> {
     public boolean isShowDurability() { return showDurability; }
     public PeakItemSlot showDurability(boolean showDurability) { this.showDurability = showDurability; return this; }
 
-    public String getCountText() { return countText == null ? "" : countText; }
-    public PeakItemSlot countText(String text) { this.countText = text == null ? "" : text; return this; }
+    public Component getCountText() { return countText == null ? Component.empty() : countText; }
+    public PeakItemSlot countText(String text) { return countText(Component.literal(text == null ? "" : text)); }
+    public PeakItemSlot countText(Component text) { this.countText = text == null ? Component.empty() : text; return this; }
 
     public boolean isSelected() { return selected; }
     public PeakItemSlot selected(boolean selected) { this.selected = selected; return this; }

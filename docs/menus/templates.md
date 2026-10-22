@@ -129,3 +129,30 @@ PeakRichTextToolbar.create("mygame:toolbar", "mygame:notes").colorPicker();
 
 `colorPicker()` adds a button that shows and hides a color picker. The buttons keep the focus in the text box and show the
 active style at the caret.
+
+## Texts and languages
+
+The texts that templates add by themselves are language keys. Each player sees them in their own language. Your own texts
+can be a `String` or a `Component`, so they can use language keys too.
+
+| Key | Used for | English |
+| --- | --- | --- |
+| `peakclient.template.paged.previous`, `.next` | Paged List buttons | `<`, `>` |
+| `peakclient.template.paged.label` | Paged List page text (page, total) | `Page %s / %s` |
+| `peakclient.template.paged.loading` | Remote page placeholder | `Loading...` |
+| `peakclient.template.confirm.title`, `.confirm`, `.cancel` | Confirm Dialog | `Confirm`, `Confirm`, `Cancel` |
+| `peakclient.template.form.required` | Form Field error | `This field is required` |
+| `peakclient.template.toolbar.*` | Rich Text Toolbar buttons | `B`, `I`, `U`, `S`, `C`, `Tx` |
+| `peakclient.menu.title` | menu title when you set none | `PeakClient Menu` |
+
+German texts are included. They are used when the player plays in German.
+
+To translate or change them, add the keys to a language file of a resource pack. To use your own text, pass it to the
+template:
+
+```java
+PeakPagedList.create("mygame:players", 8).labelKey("mygame.pages").buttonTexts("Back", "More");
+PeakConfirmDialog.create("mygame:delete").title(Component.translatable("mygame.delete.title"));
+```
+
+The label key of a Paged List gets the page number and the number of pages as arguments.

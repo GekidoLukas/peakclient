@@ -1,18 +1,13 @@
 package net.gekidolukas.peakclient.ui.patch;
 
-import com.google.gson.JsonArray;
 import net.gekidolukas.peakclient.ui.PeakPaint;
+import net.gekidolukas.peakclient.ui.serialize.PeakComponentAdapter;
 import net.gekidolukas.peakclient.ui.serialize.PeakPaintAdapter;
+import net.minecraft.network.chat.Component;
 
 public final class PeakLabelPatch extends PeakBasePatch<PeakLabelPatch> {
     public PeakLabelPatch text(String text) { data.addProperty("text", text); return this; }
-    public PeakLabelPatch translationKey(String key, String... args) {
-        data.addProperty("translationKey", key);
-        JsonArray argsJson = new JsonArray();
-        for (String arg : args) argsJson.add(arg);
-        data.add("translationArgs", argsJson);
-        return this;
-    }
+    public PeakLabelPatch text(Component text) { data.add("text", PeakComponentAdapter.toTree(text)); return this; }
     public PeakLabelPatch color(int argb) { data.addProperty("color", argb); return this; }
     public PeakLabelPatch color(PeakPaint paint) { data.add("color", PeakPaintAdapter.toTree(paint)); return this; }
     public PeakLabelPatch shadow(boolean shadow) { data.addProperty("shadow", shadow); return this; }

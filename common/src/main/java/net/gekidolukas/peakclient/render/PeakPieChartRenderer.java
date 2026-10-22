@@ -10,6 +10,7 @@ import net.gekidolukas.peakclient.ui.PeakChartEntry;
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakLegendPosition;
 import net.gekidolukas.peakclient.ui.PeakPieChart;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -76,8 +77,8 @@ public final class PeakPieChartRenderer implements PeakElementRenderer<PeakPieCh
     private int measureLegendWidth(Font font, List<PeakChartEntry> entries) {
         int max = 0;
         for (PeakChartEntry e : entries) {
-            String text = e.label() != null ? e.label() : "";
-            max = Math.max(max, 7 + font.width(text));
+            PeakStyledText text = PeakTextResolver.resolved(e, e.label());
+            max = Math.max(max, 7 + text.width(font));
         }
         return max;
     }
@@ -96,7 +97,7 @@ public final class PeakPieChartRenderer implements PeakElementRenderer<PeakPieCh
 
         int y = startY;
         for (PeakChartEntry entry : entries) {
-            String text = entry.label() != null ? entry.label() : "";
+            PeakStyledText text = PeakTextResolver.resolved(entry, entry.label());
             PeakPaintRenderer.fill(graphics, entry.color(), startX, y + 1, startX + 5, y + 6);
             PeakImmediateRender.text(graphics, font, text, startX + 7, y, 0xFFFFFF, true);
             y += font.lineHeight + 1;

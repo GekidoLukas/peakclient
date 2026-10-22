@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 public final class PeakButton extends PeakContainer<PeakButton> {
     public static final int DEFAULT_BACKGROUND = 0xFF555555;
     public static final int DEFAULT_HOVER_BACKGROUND = 0xFF707070;
@@ -28,7 +30,16 @@ public final class PeakButton extends PeakContainer<PeakButton> {
         return button.add(PeakLabel.create(button.getId() + "/label", text));
     }
 
+    public static PeakButton text(Component text) {
+        PeakButton button = new PeakButton();
+        return button.add(PeakLabel.create(button.getId() + "/label", text));
+    }
+
     public static PeakButton text(String id, String text) {
+        return new PeakButton(id).add(PeakLabel.create(id + "/label", text));
+    }
+
+    public static PeakButton text(String id, Component text) {
         return new PeakButton(id).add(PeakLabel.create(id + "/label", text));
     }
 

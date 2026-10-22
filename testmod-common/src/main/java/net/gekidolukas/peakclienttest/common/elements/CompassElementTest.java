@@ -4,7 +4,10 @@ import net.gekidolukas.peakclient.api.PeakClient;
 import net.gekidolukas.peakclient.ui.*;
 import net.gekidolukas.peakclienttest.common.PeakElementTest;
 import net.gekidolukas.peakclienttest.common.PeakElementTestStep;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -60,6 +63,26 @@ public final class CompassElementTest implements PeakElementTest {
                                 PeakWaypoint.of(playerX + 30, player.getY(), playerZ + i * 2, "Loot Drop")
                                         .color(0x55FF55).icon("minecraft:textures/map/decorations/target_x.png").visibleIn(compass.getId()));
                     }
+                }),
+                PeakElementTestStep.of("styled and translated labels: a gold bold name, an alt font name, a translated key and a tracked entity name keep their style", 100, (player, docId) -> {
+                    PeakDocument doc = PeakDocument.create(docId);
+                    PeakCompass compass = base();
+                    doc.add(compass);
+                    PeakClient.to(player).sendUi(doc);
+
+                    double playerX = player.getX(), playerZ = player.getZ();
+                    PeakClient.to(player).upsertWaypoint(PeakWaypoint.of(playerX + 40, player.getY(), playerZ - 12,
+                            Component.literal("Gold Bold").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD))
+                            .color(0xFFFFFF).visibleIn(compass.getId()));
+                    PeakClient.to(player).upsertWaypoint(PeakWaypoint.of(playerX + 40, player.getY(), playerZ - 4,
+                            Component.literal("Alt font").withStyle(Style.EMPTY.withFont(ResourceLocation.parse("minecraft:alt"))))
+                            .color(0xFFFFFF).visibleIn(compass.getId()));
+                    PeakClient.to(player).upsertWaypoint(PeakWaypoint.of(playerX + 40, player.getY(), playerZ + 4,
+                            Component.translatable("gui.done")).color(0xFFFFFF).visibleIn(compass.getId()));
+                    PeakClient.to(player).upsertWaypoint(PeakWaypoint.of(playerX + 40, player.getY(), playerZ + 12,
+                            Component.literal("Twin").withStyle(ChatFormatting.GREEN)).color(0xFFFFFF).visibleIn(compass.getId()));
+                    PeakClient.to(player).upsertWaypoint(PeakWaypoint.of(playerX + 40, player.getY(), playerZ + 14,
+                            Component.literal("Twin").withStyle(ChatFormatting.GREEN)).color(0xFFFFFF).visibleIn(compass.getId()));
                 }),
                 PeakElementTestStep.document("FIXED scaling document: the compass sits centered at the top", 80, doc -> {
                     doc.scaling(PeakScaling.FIXED);

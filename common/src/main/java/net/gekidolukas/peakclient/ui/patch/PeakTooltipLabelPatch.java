@@ -1,12 +1,14 @@
 package net.gekidolukas.peakclient.ui.patch;
 
 import net.gekidolukas.peakclient.ui.PeakPaint;
-import net.gekidolukas.peakclient.ui.serialize.PeakPaintAdapter;
 import net.gekidolukas.peakclient.ui.PeakTooltipBackgroundStyle;
+import net.gekidolukas.peakclient.ui.serialize.PeakComponentAdapter;
+import net.gekidolukas.peakclient.ui.serialize.PeakPaintAdapter;
+import net.minecraft.network.chat.Component;
 
 public final class PeakTooltipLabelPatch extends PeakBasePatch<PeakTooltipLabelPatch> {
     public PeakTooltipLabelPatch text(String text) { data.addProperty("text", text); return this; }
-    public PeakTooltipLabelPatch translationKey(String key) { data.addProperty("translationKey", key); return this; }
+    public PeakTooltipLabelPatch text(Component text) { data.add("text", PeakComponentAdapter.toTree(text)); return this; }
     public PeakTooltipLabelPatch color(int argb) { data.addProperty("color", argb); return this; }
     public PeakTooltipLabelPatch color(PeakPaint paint) { data.add("color", PeakPaintAdapter.toTree(paint)); return this; }
     public PeakTooltipLabelPatch borderColor(int argb) { data.addProperty("borderColor", argb); return this; }

@@ -21,6 +21,8 @@ PeakPanel.create("mygame:sneak-hint").bind("hidden", "{mc:is_sneaking}");
 | Team and score | `team_name`, `team_color` (`#RRGGBB`), `score=<objective>` |
 | Flags | `is_sneaking`, `is_sprinting`, `is_swimming`, `is_flying`, `is_on_ground`, `is_in_water`, `is_riding`, `is_raining`, `is_day`, `has_target_entity`, `has_target_block` |
 
+`player_display_name` and `target_entity` keep the colors and styles of the name, for example a team color.
+
 ## Flags and bindings
 
 Flags return `true` or `false`, so they are made for bindings:

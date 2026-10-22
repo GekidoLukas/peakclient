@@ -76,7 +76,7 @@ class PeakFormElementsTest {
         PeakRadioGroup read = (PeakRadioGroup) roundTrip(menu).findById("ns:size");
 
         assertEquals(4, read.getOptions().size());
-        assertEquals("Large", read.getOptions().get(2).getText());
+        assertEquals("Large", read.getOptions().get(2).getText().getString());
         assertFalse(read.getOptions().get(2).isEnabled());
         assertEquals("m", read.getSelected());
         assertEquals(PeakLayoutDirection.ROW, read.getDirection());

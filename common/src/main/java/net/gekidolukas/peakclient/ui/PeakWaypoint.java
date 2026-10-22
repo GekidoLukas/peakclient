@@ -1,5 +1,7 @@
 package net.gekidolukas.peakclient.ui;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +11,7 @@ public final class PeakWaypoint {
 
     private String id = PeakId.random();
     private double x, y, z;
-    private String label;
+    private Component label;
     @PeakOpaqueColor private PeakPaint color = PeakPaint.WHITE;
     private String icon;
     private float iconScale = 1.0f;
@@ -25,6 +27,10 @@ public final class PeakWaypoint {
     private PeakWaypoint() {}
 
     public static PeakWaypoint of(double x, double y, double z, String label) {
+        return of(x, y, z, label == null ? null : Component.literal(label));
+    }
+
+    public static PeakWaypoint of(double x, double y, double z, Component label) {
         PeakWaypoint w = new PeakWaypoint();
         w.x = x; w.y = y; w.z = z; w.label = label;
         return w;
@@ -43,8 +49,9 @@ public final class PeakWaypoint {
     public double getX() { return x; }
     public double getY() { return y; }
     public double getZ() { return z; }
-    public String getLabel() { return label; }
-    public PeakWaypoint label(String label) { this.label = label; return this; }
+    public Component getLabel() { return label; }
+    public PeakWaypoint label(String label) { this.label = label == null ? null : Component.literal(label); return this; }
+    public PeakWaypoint label(Component label) { this.label = label; return this; }
     public PeakPaint getColor() { return color; }
     public PeakWaypoint color(PeakPaint paint) { this.color = paint.opaque(); return this; }
     public PeakWaypoint color(int argb) { return color(PeakPaint.solid(argb)); }

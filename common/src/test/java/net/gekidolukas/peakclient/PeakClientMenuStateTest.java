@@ -29,7 +29,7 @@ class PeakClientMenuStateTest {
                 new PeakUiOperation.Update("shop:label", PeakPatch.label().text("edited").build())));
 
         assertTrue(applied);
-        assertEquals("edited", ((PeakLabel) state.get("shop").findById("shop:label")).getText());
+        assertEquals("edited", ((PeakLabel) state.get("shop").findById("shop:label")).getText().getString());
     }
 
     @Test
@@ -47,7 +47,7 @@ class PeakClientMenuStateTest {
 
         state.put(menu("shop"), Set.of());
 
-        assertEquals("start", ((PeakLabel) state.get("shop").findById("shop:label")).getText());
+        assertEquals("start", ((PeakLabel) state.get("shop").findById("shop:label")).getText().getString());
         assertEquals(1, state.size());
     }
 

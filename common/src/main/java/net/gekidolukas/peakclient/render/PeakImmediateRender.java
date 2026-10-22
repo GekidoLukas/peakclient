@@ -10,12 +10,16 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import net.gekidolukas.peakclient.ui.PeakArgb;
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakSolidColor;
-import net.minecraft.ChatFormatting;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.FormattedCharSink;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -197,25 +201,25 @@ public final class PeakImmediateRender {
     }
 
     public static void text(GuiGraphics graphics, Font font, String text, int x, int y, int color, boolean shadow) {
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
+        text(graphics, font, PeakStyledText.ofLegacy(text), x, y, color, shadow);
+    }
 
+    public static void text(GuiGraphics graphics, Font font, PeakStyledText text, int x, int y, int color, boolean shadow) {
+        if (text.isEmpty()) return;
+        beginText();
+        Matrix4f matrix = graphics.pose().last().pose();
         MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(TEXT_BUFFER_POOL);
 
         if (shadow) {
-            drawShadowSegments(font, text, x, y, color, graphics.pose().last().pose(), immediate);
+            font.drawInBatch(shadowSequence(text, color), x + 1, y + 1, vanillaShadowColor(color), false, matrix, immediate,
+                    Font.DisplayMode.NORMAL, 0, 0xF000F0);
+            immediate.endBatch();
         }
-        font.drawInBatch(text, x, y, color, false, graphics.pose().last().pose(), immediate,
-                Font.DisplayMode.NORMAL, 0, 0xF000F0);
+        font.drawInBatch(text.sequence(), x, y, color, false, matrix, immediate, Font.DisplayMode.NORMAL, 0, 0xF000F0);
 
         PeakRenderStats.countText();
         immediate.endBatch();
-
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
+        endText();
     }
 
     private static int glyphColor(PeakPaint paint, float fraction, float spanWidth, int lineHeight) {
@@ -224,136 +228,106 @@ public final class PeakImmediateRender {
     }
 
     public static void text(GuiGraphics graphics, Font font, String text, int x, int y, PeakPaint paint, boolean shadow) {
-        text(graphics, font, text, x, y, paint, shadow, x, Math.max(1, font.width(text)));
+        text(graphics, font, PeakStyledText.ofLegacy(text), x, y, paint, shadow);
+    }
+
+    public static void text(GuiGraphics graphics, Font font, PeakStyledText text, int x, int y, PeakPaint paint, boolean shadow) {
+        text(graphics, font, text, x, y, paint, shadow, x, Math.max(1, text.width(font)));
     }
 
     public static void text(GuiGraphics graphics, Font font, String text, int x, int y, PeakPaint paint, boolean shadow,
                             float spanX, float spanWidth) {
-        if (paint.isNone()) return;
+        text(graphics, font, PeakStyledText.ofLegacy(text), x, y, paint, shadow, spanX, spanWidth);
+    }
+
+    public static void text(GuiGraphics graphics, Font font, PeakStyledText text, int x, int y, PeakPaint paint, boolean shadow,
+                            float spanX, float spanWidth) {
+        if (paint.isNone() || text.isEmpty()) return;
         if (paint instanceof PeakSolidColor solid) {
             text(graphics, font, text, x, y, solid.argb(), shadow);
             return;
         }
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-
+        beginText();
         Matrix4f matrix = graphics.pose().last().pose();
         MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(TEXT_BUFFER_POOL);
-        StringBuilder styles = new StringBuilder();
-        Integer explicitColor = null;
-        float cursorX = x;
-        int index = 0;
-        while (index < text.length()) {
-            char character = text.charAt(index);
-            if (character == '§' && index + 1 < text.length()) {
-                char code = text.charAt(index + 1);
-                if (code == 'x' && isHexSequence(text, index)) {
-                    explicitColor = parseHexSequence(text, index);
-                    styles.setLength(0);
-                    index += 14;
-                    continue;
-                }
-                ChatFormatting formatting = ChatFormatting.getByCode(code);
-                if (code == 'r' || (formatting != null && formatting.isColor())) {
-                    styles.setLength(0);
-                    explicitColor = code == 'r' || formatting.getColor() == null ? null : 0xFF000000 | formatting.getColor();
-                } else if (formatting != null) {
-                    styles.append('§').append(code);
-                }
-                index += 2;
-                continue;
+
+        GlyphCollector collector = new GlyphCollector(font, paint, x, spanX, spanWidth);
+        text.sequence().accept(collector);
+
+        if (shadow) {
+            for (Glyph glyph : collector.glyphs) {
+                Style style = glyph.style().getColor() == null ? glyph.style()
+                        : glyph.style().withColor(shadowRgb(glyph.style().getColor().getValue()));
+                font.drawInBatch(FormattedCharSequence.codepoint(glyph.codepoint(), style), glyph.x() + 1, y + 1,
+                        vanillaShadowColor(glyph.color()), false, matrix, immediate, Font.DisplayMode.NORMAL, 0, 0xF000F0);
             }
-            String glyph = styles.toString() + character;
-            float glyphWidth = font.width(glyph);
-            int color = explicitColor != null ? explicitColor
-                    : glyphColor(paint, (cursorX - spanX + glyphWidth / 2f) / Math.max(1f, spanWidth), spanWidth, font.lineHeight);
-            if (shadow) {
-                font.drawInBatch(glyph, cursorX + 1, y + 1, vanillaShadowColor(color), false, matrix, immediate,
-                        Font.DisplayMode.NORMAL, 0, 0xF000F0);
-            }
-            font.drawInBatch(glyph, cursorX, y, color, false, matrix, immediate, Font.DisplayMode.NORMAL, 0, 0xF000F0);
-            cursorX += glyphWidth;
-            index++;
+            immediate.endBatch();
+        }
+        for (Glyph glyph : collector.glyphs) {
+            font.drawInBatch(FormattedCharSequence.codepoint(glyph.codepoint(), glyph.style()), glyph.x(), y, glyph.color(), false,
+                    matrix, immediate, Font.DisplayMode.NORMAL, 0, 0xF000F0);
         }
 
         PeakRenderStats.countText();
         immediate.endBatch();
+        endText();
+    }
 
+    private static void beginText() {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+    }
+
+    private static void endText() {
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
 
-    private record Segment(String text, int color) {}
+    private static FormattedCharSequence shadowSequence(PeakStyledText text, int baseColor) {
+        FormattedCharSequence source = text.sequence();
+        int baseRgb = baseColor & 0xFFFFFF;
+        return sink -> source.accept((index, style, codepoint) -> {
+            TextColor color = style.getColor();
+            return sink.accept(index, style.withColor(shadowRgb(color != null ? color.getValue() : baseRgb)), codepoint);
+        });
+    }
 
-    private static void drawShadowSegments(Font font, String text, int x, int y, int baseColor,
-                                           Matrix4f matrix, MultiBufferSource.BufferSource immediate) {
-        List<Segment> segments = splitByFormatting(text, baseColor);
-        int cursorX = x;
-        for (Segment segment : segments) {
-            int shadowColor = vanillaShadowColor(segment.color());
-            font.drawInBatch(segment.text(), cursorX + 1, y + 1, shadowColor, false, matrix, immediate,
-                    Font.DisplayMode.NORMAL, 0, 0xF000F0);
-            cursorX += font.width(segment.text());
+    private record Glyph(Style style, int codepoint, float x, int color) {}
+
+    private static final class GlyphCollector implements FormattedCharSink {
+        private final Font font;
+        private final PeakPaint paint;
+        private final float spanX;
+        private final float spanWidth;
+        private final List<Glyph> glyphs = new ArrayList<>();
+        private float cursor;
+
+        private GlyphCollector(Font font, PeakPaint paint, float start, float spanX, float spanWidth) {
+            this.font = font;
+            this.paint = paint;
+            this.spanX = spanX;
+            this.spanWidth = spanWidth;
+            this.cursor = start;
+        }
+
+        @Override
+        public boolean accept(int index, Style style, int codepoint) {
+            float width = font.width(FormattedCharSequence.codepoint(codepoint, style));
+            TextColor styleColor = style.getColor();
+            int color = styleColor != null ? 0xFF000000 | styleColor.getValue()
+                    : glyphColor(paint, (cursor - spanX + width / 2f) / Math.max(1f, spanWidth), spanWidth, font.lineHeight);
+            glyphs.add(new Glyph(style, codepoint, cursor, color));
+            cursor += width;
+            return true;
         }
     }
 
-    private static List<Segment> splitByFormatting(String text, int baseColor) {
-        List<Segment> segments = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        int currentColor = baseColor;
-        int i = 0;
-
-        while (i < text.length()) {
-            char character = text.charAt(i);
-            if (character == '§' && i + 1 < text.length()) {
-                char code = text.charAt(i + 1);
-                if (code == 'x' && i + 13 < text.length() && isHexSequence(text, i)) {
-                    if (current.length() > 0) { segments.add(new Segment(current.toString(), currentColor)); current = new StringBuilder(); }
-                    currentColor = parseHexSequence(text, i);
-                    i += 14;
-                    continue;
-                }
-                ChatFormatting formatting = ChatFormatting.getByCode(code);
-                if (formatting != null && formatting.isColor()) {
-                    if (current.length() > 0) { segments.add(new Segment(current.toString(), currentColor)); current = new StringBuilder(); }
-                    currentColor = formatting.getColor() != null ? (0xFF000000 | formatting.getColor()) : baseColor;
-                    i += 2;
-                    continue;
-                }
-                if (code == 'r') {
-                    if (current.length() > 0) { segments.add(new Segment(current.toString(), currentColor)); current = new StringBuilder(); }
-                    currentColor = baseColor;
-                    i += 2;
-                    continue;
-                }
-                current.append(character).append(code);
-                i += 2;
-                continue;
-            }
-            current.append(character);
-            i++;
-        }
-        if (current.length() > 0) segments.add(new Segment(current.toString(), currentColor));
-        return segments;
-    }
-
-    private static boolean isHexSequence(String text, int start) {
-        if (text.charAt(start + 1) != 'x') return false;
-        for (int digit = 0; digit < 6; digit++) {
-            int separatorIndex = start + 2 + digit * 2;
-            if (separatorIndex + 1 >= text.length() || text.charAt(separatorIndex) != '§') return false;
-        }
-        return true;
-    }
-
-    private static int parseHexSequence(String text, int start) {
-        StringBuilder hex = new StringBuilder();
-        for (int digit = 0; digit < 6; digit++) hex.append(text.charAt(start + 3 + digit * 2));
-        return 0xFF000000 | Integer.parseInt(hex.toString(), 16);
+    private static int shadowRgb(int rgb) {
+        return (rgb & 0xFCFCFC) >> 2;
     }
 
     private static int vanillaShadowColor(int color) {

@@ -37,6 +37,7 @@ import net.gekidolukas.peakclient.ui.PeakSortedList;
 import net.gekidolukas.peakclient.ui.PeakStagger;
 import net.gekidolukas.peakclient.ui.PeakTableLayoutPanel;
 import net.gekidolukas.peakclient.ui.PeakTableStyle;
+import net.gekidolukas.peakclient.ui.PeakTileSpans;
 import net.gekidolukas.peakclient.ui.PeakTrack;
 import net.gekidolukas.peakclient.ui.PeakTrackStyle;
 import net.gekidolukas.peakclient.ui.client.PeakActionScope;
@@ -975,6 +976,12 @@ public final class PeakUiRenderer {
     static void blitNineSlice(GuiGraphics graphics, ResourceLocation texture,
                                       int x, int y, int width, int height,
                                       int texWidth, int texHeight, int corner) {
+        blitNineSlice(graphics, texture, x, y, width, height, texWidth, texHeight, corner, false);
+    }
+
+    static void blitNineSlice(GuiGraphics graphics, ResourceLocation texture,
+                                      int x, int y, int width, int height,
+                                      int texWidth, int texHeight, int corner, boolean tile) {
         int cornerSize = Math.max(0, Math.min(corner, Math.min(texWidth, texHeight) / 2));
         int middleSourceWidth = Math.max(1, texWidth - cornerSize * 2);
         int middleSourceHeight = Math.max(1, texHeight - cornerSize * 2);
@@ -987,16 +994,34 @@ public final class PeakUiRenderer {
         PeakImmediateRender.blit(graphics, texture, x + width - cornerSize, y + height - cornerSize, texWidth - cornerSize, texHeight - cornerSize, cornerSize, cornerSize, texWidth, texHeight);
 
         if (middleDestWidth > 0) {
-            PeakImmediateRender.blit(graphics, texture, x + cornerSize, y, middleDestWidth, cornerSize, cornerSize, 0, middleSourceWidth, cornerSize, texWidth, texHeight);
-            PeakImmediateRender.blit(graphics, texture, x + cornerSize, y + height - cornerSize, middleDestWidth, cornerSize, cornerSize, texHeight - cornerSize, middleSourceWidth, cornerSize, texWidth, texHeight);
+            blitRegion(graphics, texture, x + cornerSize, y, middleDestWidth, cornerSize, cornerSize, 0, middleSourceWidth, cornerSize, texWidth, texHeight, tile);
+            blitRegion(graphics, texture, x + cornerSize, y + height - cornerSize, middleDestWidth, cornerSize, cornerSize, texHeight - cornerSize, middleSourceWidth, cornerSize, texWidth, texHeight, tile);
         }
         if (middleDestHeight > 0) {
-            PeakImmediateRender.blit(graphics, texture, x, y + cornerSize, cornerSize, middleDestHeight, 0, cornerSize, cornerSize, middleSourceHeight, texWidth, texHeight);
-            PeakImmediateRender.blit(graphics, texture, x + width - cornerSize, y + cornerSize, cornerSize, middleDestHeight, texWidth - cornerSize, cornerSize, cornerSize, middleSourceHeight, texWidth, texHeight);
+            blitRegion(graphics, texture, x, y + cornerSize, cornerSize, middleDestHeight, 0, cornerSize, cornerSize, middleSourceHeight, texWidth, texHeight, tile);
+            blitRegion(graphics, texture, x + width - cornerSize, y + cornerSize, cornerSize, middleDestHeight, texWidth - cornerSize, cornerSize, cornerSize, middleSourceHeight, texWidth, texHeight, tile);
         }
 
         if (middleDestWidth > 0 && middleDestHeight > 0) {
-            PeakImmediateRender.blit(graphics, texture, x + cornerSize, y + cornerSize, middleDestWidth, middleDestHeight, cornerSize, cornerSize, middleSourceWidth, middleSourceHeight, texWidth, texHeight);
+            blitRegion(graphics, texture, x + cornerSize, y + cornerSize, middleDestWidth, middleDestHeight, cornerSize, cornerSize, middleSourceWidth, middleSourceHeight, texWidth, texHeight, tile);
+        }
+    }
+
+    private static final int MAX_TILES = 1024;
+
+    private static void blitRegion(GuiGraphics graphics, ResourceLocation texture, int destX, int destY, int destWidth, int destHeight,
+                                   int srcX, int srcY, int srcWidth, int srcHeight, int texWidth, int texHeight, boolean tile) {
+        if (srcWidth <= 0 || srcHeight <= 0 || destWidth <= 0 || destHeight <= 0) return;
+        long tiles = (long) PeakTileSpans.count(destWidth, srcWidth) * PeakTileSpans.count(destHeight, srcHeight);
+        if (!tile || tiles > MAX_TILES) {
+            PeakImmediateRender.blit(graphics, texture, destX, destY, destWidth, destHeight, srcX, srcY, srcWidth, srcHeight, texWidth, texHeight);
+            return;
+        }
+        for (PeakTileSpans.Span row : PeakTileSpans.centered(destHeight, srcHeight)) {
+            for (PeakTileSpans.Span column : PeakTileSpans.centered(destWidth, srcWidth)) {
+                PeakImmediateRender.blit(graphics, texture, destX + column.destOffset(), destY + row.destOffset(), column.length(), row.length(),
+                        srcX + column.srcOffset(), srcY + row.srcOffset(), column.length(), row.length(), texWidth, texHeight);
+            }
         }
     }
 }

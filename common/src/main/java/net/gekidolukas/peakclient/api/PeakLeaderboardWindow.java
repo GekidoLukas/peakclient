@@ -13,6 +13,7 @@ import net.gekidolukas.peakclient.ui.PeakPanel;
 import net.gekidolukas.peakclient.ui.PeakPopupAnimation;
 import net.gekidolukas.peakclient.ui.PeakSortedList;
 import net.gekidolukas.peakclient.ui.patch.PeakPatch;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,6 +207,14 @@ public final class PeakLeaderboardWindow<K> {
         PeakServerThread.run(() -> ranking.add(key, name, delta));
     }
 
+    public void set(K key, Component name, double score) {
+        PeakServerThread.run(() -> ranking.set(key, name, score));
+    }
+
+    public void add(K key, Component name, double delta) {
+        PeakServerThread.run(() -> ranking.add(key, name, delta));
+    }
+
     public void remove(K key) {
         PeakServerThread.run(() -> ranking.remove(key));
     }
@@ -280,6 +289,10 @@ public final class PeakLeaderboardWindow<K> {
         return neighbours == 0 ? selfKey(name) : selfKey(name + "-" + slot);
     }
 
+    private PeakValueKey<Component> nameKey(int slot) {
+        return PeakValueKey.ofComponent(id + "/self-" + (neighbours == 0 ? "name" : "name-" + slot));
+    }
+
     private String slotId(int slot) {
         return neighbours == 0 ? selfId() : selfId() + "/row-" + slot;
     }
@@ -302,7 +315,7 @@ public final class PeakLeaderboardWindow<K> {
 
     private PeakPanel slotPanel(int slot) {
         PeakPanel panel = standardRow.panel(slotId(slot), slotKey("rank", slot).placeholder(NO_VALUE),
-                slotKey("name", slot).placeholder(NO_VALUE), slotKey("score", slot).placeholder(NO_VALUE));
+                Component.literal(nameKey(slot).placeholder(NO_VALUE)), slotKey("score", slot).placeholder(NO_VALUE));
         if (slot == neighbours) ownStyle.accept(panel);
         return panel;
     }
@@ -312,8 +325,8 @@ public final class PeakLeaderboardWindow<K> {
             int current = slot;
             tasks.add(audience.values().bindPerPlayer(slotKey("rank", slot),
                     uuid -> slotText(uuid, current, placed -> standardRow.getRankFormat().apply(placed.rank())), intervalTicks));
-            tasks.add(audience.values().bindPerPlayer(slotKey("name", slot),
-                    uuid -> slotText(uuid, current, placed -> placed.entry().name()), intervalTicks));
+            tasks.add(audience.values().bindPerPlayer(nameKey(slot),
+                    uuid -> slotName(uuid, current), intervalTicks));
             tasks.add(audience.values().bindPerPlayer(slotKey("score", slot),
                     uuid -> slotText(uuid, current, placed -> standardRow.getScoreFormat().apply(placed.entry().score())), intervalTicks));
             if (neighbours > 0 && slot != neighbours) {
@@ -353,6 +366,11 @@ public final class PeakLeaderboardWindow<K> {
             if (placed.rank() == wanted) return placed;
         }
         return null;
+    }
+
+    private Component slotName(UUID uuid, int slot) {
+        PeakLeaderboardRanking.Placed<K> placed = slotPlaced(uuid, slot);
+        return placed == null ? Component.literal(NO_VALUE) : placed.entry().name();
     }
 
     private String slotText(UUID uuid, int slot, Function<PeakLeaderboardRanking.Placed<K>, String> formatter) {

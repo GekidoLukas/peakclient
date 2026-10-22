@@ -1,25 +1,27 @@
 package net.gekidolukas.peakclient.render;
 
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakTimer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Style;
 
 import java.util.Locale;
 
 public final class PeakTimerRenderer implements PeakElementRenderer<PeakTimer> {
     @Override
     public void renderContent(PeakRenderContext ctx, PeakTimer timer, int width, int height) {
-        String text = formatTimer(timer);
+        PeakStyledText text = formatTimer(timer);
         PeakImmediateRender.text(ctx.graphics(),ctx.font(), text, 0, 0, timer.getColor(), timer.hasShadow());
     }
 
     @Override
     public PeakPixelSize measureContent(Font font, PeakTimer timer) {
-        return new PeakPixelSize(font.width(formatTimer(timer)), font.lineHeight);
+        return new PeakPixelSize(formatTimer(timer).width(font), font.lineHeight);
     }
 
-    private static String formatTimer(PeakTimer timer) {
+    private static PeakStyledText formatTimer(PeakTimer timer) {
         long ticks = Math.max(0, timer.currentValue());
         long totalSeconds = ticks / 20;
 
@@ -44,8 +46,10 @@ public final class PeakTimerRenderer implements PeakElementRenderer<PeakTimer> {
             default -> core = Long.toString(ticks);
         }
 
-        String suffix = timer.getSuffix().isEmpty() ? autoSuffix : timer.getSuffix();
-        return timer.getPrefix() + core + suffix;
+        PeakStyledText prefix = PeakTextResolver.resolved(timer, "prefix", timer.getPrefix());
+        PeakStyledText customSuffix = PeakTextResolver.resolved(timer, "suffix", timer.getSuffix());
+        PeakStyledText suffix = customSuffix.isEmpty() ? PeakStyledText.ofLegacy(autoSuffix) : customSuffix;
+        return prefix.concat(PeakStyledText.of(core, Style.EMPTY)).concat(suffix);
     }
 
     private static String suffixFor(String unitKey) {

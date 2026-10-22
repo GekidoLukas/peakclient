@@ -3,6 +3,7 @@ package net.gekidolukas.peakclient.render;
 import net.gekidolukas.peakclient.PeakClientTickCounter;
 import net.gekidolukas.peakclient.ui.PeakPaint;
 import net.gekidolukas.peakclient.ui.PeakPixelSize;
+import net.gekidolukas.peakclient.ui.PeakStyledText;
 import net.gekidolukas.peakclient.ui.PeakStyle;
 import net.gekidolukas.peakclient.ui.PeakTextBox;
 import net.gekidolukas.peakclient.ui.client.PeakMenuInteractionState;
@@ -46,8 +47,9 @@ public final class PeakTextBoxRenderer implements PeakElementRenderer<PeakTextBo
 
         PeakTextEditor editor = focused ? PeakMenuInteractionState.editor(field) : null;
         if (value.isEmpty() && editor == null && dropIndex < 0) {
-            if (!field.getPlaceholder().isEmpty()) {
-                PeakImmediateRender.text(graphics, font, field.getPlaceholder(), PADDING, textY, 0x707070, false);
+            PeakStyledText placeholderText = PeakTextResolver.resolved(field, field.getPlaceholder());
+            if (!placeholderText.isEmpty()) {
+                PeakImmediateRender.text(graphics, font, placeholderText, PADDING, textY, 0x707070, false);
             }
             return;
         }

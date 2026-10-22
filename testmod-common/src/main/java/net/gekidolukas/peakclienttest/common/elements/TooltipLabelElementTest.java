@@ -20,11 +20,16 @@ public final class TooltipLabelElementTest implements PeakElementTest {
                                 .backgroundStyle(PeakTooltipBackgroundStyle.DRAWN_BOX)
                                 .borderColor(PeakPaint.rgba(255, 100, 0, 220))
                                 .absolute(PeakAnchor.CENTER, 0, 0))),
-                PeakElementTestStep.document("backgroundStyle CUSTOM_TEXTURE", 60, doc ->
-                        doc.add(PeakTooltipLabel.create("Custom texture background")
-                                .backgroundTexture("minecraft:textures/gui/title/minecraft.png")
-                                .absolute(PeakAnchor.CENTER, 0, 0))),
-                PeakElementTestStep.document("tooltipPadding: 0/0 (top), 4/2 (middle) and 16/10 (bottom)", 60, doc -> {
+                PeakElementTestStep.document("backgroundStyle CUSTOM_TEXTURE: the corners stay sharp, edges and middle repeat from their centre; the text keeps the corner inset", 80, doc -> {
+                    doc.add(PeakTooltipLabel.create("Custom texture, default padding")
+                            .backgroundTexture("minecraft:textures/block/lodestone_side.png")
+                            .absolute(PeakAnchor.CENTER, 0, -20));
+                    doc.add(PeakTooltipLabel.create("Custom texture with padding 4 / 2")
+                            .backgroundTexture("minecraft:textures/block/lodestone_side.png")
+                            .tooltipPadding(4, 2)
+                            .absolute(PeakAnchor.CENTER, 0, 20));
+                }),
+                PeakElementTestStep.document("tooltipPadding is the space per side: 0/0 (top), 4/2 (middle) and 16/10 (bottom)", 60, doc -> {
                     doc.add(PeakTooltipLabel.create("Padding 0 0").tooltipPadding(0, 0).absolute(PeakAnchor.CENTER, 0, -40));
                     doc.add(PeakTooltipLabel.create("Padding 4 2").tooltipPadding(4, 2).absolute(PeakAnchor.CENTER, 0, 0));
                     doc.add(PeakTooltipLabel.create("Padding 16 10").tooltipPadding(16, 10).absolute(PeakAnchor.CENTER, 0, 40));
